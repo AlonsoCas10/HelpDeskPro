@@ -1,0 +1,822 @@
+/* ==========================================
+   CONFIGURACIÓN GENERAL
+   ========================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* ==========================================
+   PÁGINA DE LOGIN
+   ========================================== */
+
+.login-page {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(
+    135deg,
+    #0f172a,
+    #1e3a8a,
+    #2563eb
+  );
+
+  padding: 20px;
+}
+
+
+/* ==========================================
+   TARJETA
+   ========================================== */
+
+.login-container {
+  width: 100%;
+  max-width: 420px;
+
+  background-color: #ffffff;
+
+  padding: 45px 40px;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ==========================================
+   LOGO
+   ========================================== */
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+
+  margin-bottom: 18px;
+}
+
+
+
+.logo-container img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+/* ==========================================
+   TÍTULO
+   ========================================== */
+
+.login-container h1 {
+  margin: 0;
+
+  text-align: center;
+
+  color: #111827;
+
+  font-size: 30px;
+
+  font-weight: 700;
+}
+
+
+/* ==========================================
+   SUBTÍTULO
+   ========================================== */
+
+.subtitle {
+  margin-top: 8px;
+  margin-bottom: 32px;
+
+  text-align: center;
+
+  color: #6b7280;
+
+  font-size: 15px;
+}
+
+
+/* ==========================================
+   GRUPO DE INPUT
+   ========================================== */
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+
+/* ==========================================
+   LABEL
+   ========================================== */
+
+.input-group label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #374151;
+
+  font-size: 14px;
+
+  font-weight: 600;
+}
+
+
+/* ==========================================
+   INPUT
+   ========================================== */
+
+.input-group input {
+  width: 100%;
+
+  padding: 13px 14px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition: 0.2s;
+}
+
+
+/* ==========================================
+   INPUT CUANDO SE SELECCIONA
+   ========================================== */
+
+.input-group input:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+/* ==========================================
+   BOTÓN
+   ========================================== */
+
+.login-container button {
+  width: 100%;
+
+  margin-top: 8px;
+
+  padding: 13px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #1d4ed8
+  );
+
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+
+/* ==========================================
+   EFECTO DEL BOTÓN
+   ========================================== */
+
+.login-container button:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 8px 18px rgba(37, 99, 235, 0.3);
+}
+
+
+/* ==========================================
+   MENSAJE
+   ========================================== */
+
+.mensaje {
+  margin-top: 20px;
+
+  padding: 10px;
+
+  background-color: #eff6ff;
+
+  color: #1d4ed8;
+
+  border-radius: 6px;
+
+  text-align: center;
+
+  font-size: 14px;
+}
+
+
+/* ==========================================
+   PIE DE PÁGINA
+   ========================================== */
+
+.footer-text {
+  margin-top: 30px;
+
+  text-align: center;
+
+  color: #9ca3af;
+
+  font-size: 12px;
+}
+
+
+/* ==========================================
+   DISEÑO PARA CELULARES
+   ========================================== */
+
+@media (max-width: 480px) {
+
+  .login-container {
+    padding: 35px 25px;
+  }
+
+  .login-container h1 {
+    font-size: 26px;
+  }
+
+}
+
+/* ==========================================
+   DASHBOARD GENERAL
+========================================== */
+
+.dashboard {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+
+/* ==========================================
+   BARRA LATERAL
+========================================== */
+
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background: #111827;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding: 25px 20px;
+  box-sizing: border-box;
+}
+
+
+/* ==========================================
+   LOGO
+========================================== */
+
+.logo-dashboard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin-bottom: 35px;
+}
+
+.logo-dashboard img {
+  width: 150px;
+  height: auto;
+  object-fit: contain;
+}
+
+
+/* ==========================================
+   PLATAFORMA
+========================================== */
+
+.sidebar h2 {
+  font-size: 13px;
+  color: #9ca3af;
+
+  margin-bottom: 15px;
+}
+
+
+/* ==========================================
+   MENÚ
+========================================== */
+
+.menu-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-dashboard button {
+  width: 100%;
+
+  background: transparent;
+  border: none;
+
+  color: #d1d5db;
+
+  text-align: left;
+
+  padding: 12px 15px;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-size: 14px;
+}
+
+.menu-dashboard button:hover {
+  background: #1f2937;
+  color: white;
+}
+
+
+/* ==========================================
+   USUARIO
+========================================== */
+
+.sidebar-bottom {
+  border-top: 1px solid #374151;
+
+  padding-top: 20px;
+}
+
+.usuario-nombre {
+  font-weight: bold;
+  margin: 0 0 5px 0;
+}
+
+.usuario-correo {
+  font-size: 12px;
+  color: #9ca3af;
+
+  word-break: break-word;
+
+  margin-bottom: 20px;
+}
+
+
+/* ==========================================
+   CERRAR SESIÓN
+========================================== */
+
+.cerrar-sesion {
+  width: 100%;
+
+  padding: 10px;
+
+  background: transparent;
+
+  border: 1px solid #4b5563;
+
+  color: #d1d5db;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+}
+
+.cerrar-sesion:hover {
+  background: #374151;
+  color: white;
+}
+
+
+/* ==========================================
+   CONTENIDO PRINCIPAL
+========================================== */
+
+.dashboard-content {
+  flex: 1;
+
+  padding: 40px 40px 40px 20px;
+
+  box-sizing: border-box;
+
+  background: #f5f7fb;
+}
+
+
+.dashboard-content > h1 {
+  margin-top: 0;
+
+  font-size: 30px;
+
+  color: #111827;
+}
+
+
+.bienvenida {
+  font-size: 17px;
+
+  color: #6b7280;
+
+  margin-bottom: 35px;
+}
+
+
+/* ==========================================
+   TARJETAS DEL DASHBOARD
+========================================== */
+
+.dashboard-cards {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 20px;
+}
+
+
+.dashboard-card {
+  background: white;
+
+  padding: 25px;
+
+  border-radius: 12px;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+
+.dashboard-card h3 {
+  margin-top: 0;
+
+  color: #6b7280;
+
+  font-size: 15px;
+}
+
+
+.dashboard-card p {
+  font-size: 30px;
+
+  font-weight: bold;
+
+  margin-bottom: 0;
+
+  color: #111827;
+}
+
+/* ==========================================
+   EVENTOS
+========================================== */
+
+.eventos-container {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+/* CONTENEDOR DE TABLA */
+
+.tabla-eventos-container {
+  width: 100%;
+
+  overflow-x: auto;
+
+  background: white;
+
+  border-radius: 12px;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+
+/* TABLA */
+
+.tabla-eventos {
+  width: 100%;
+
+  min-width: 1200px;
+
+  border-collapse: collapse;
+
+  font-size: 13px;
+}
+
+
+/* CABECERA */
+
+.tabla-eventos thead {
+  background: #f3f4f6;
+}
+
+.tabla-eventos th {
+  padding: 15px 12px;
+
+  text-align: left;
+
+  color: #374151;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+/* FILAS */
+
+.tabla-eventos td {
+  padding: 14px 12px;
+
+  border-top: 1px solid #e5e7eb;
+
+  color: #4b5563;
+
+  white-space: nowrap;
+}
+
+
+/* EFECTO AL PASAR EL MOUSE */
+
+.tabla-eventos tbody tr:hover {
+  background: #f9fafb;
+}
+
+
+/* ==========================================
+   CLASIFICACIÓN
+========================================== */
+
+.clasificacion {
+  padding: 5px 9px;
+
+  border-radius: 20px;
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+.clasificacion.seguro {
+  background: #dcfce7;
+
+  color: #166534;
+}
+
+.clasificacion.sospechoso {
+  background: #fef3c7;
+
+  color: #92400e;
+}
+
+.clasificacion.crítico {
+  background: #fee2e2;
+
+  color: #991b1b;
+}
+
+
+/* ==========================================
+   BOTÓN DETALLE
+========================================== */
+
+.btn-detalle {
+  padding: 6px 12px;
+
+  border: none;
+
+  border-radius: 6px;
+
+  background: #e5e7eb;
+
+  color: #374151;
+
+  cursor: pointer;
+}
+
+.btn-detalle:hover {
+  background: #d1d5db;
+}
+
+/* ==========================================
+   ENCABEZADO EVENTOS
+========================================== */
+
+.eventos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  width: 100%;
+
+  margin: 0;
+  padding: 0;
+}
+
+.eventos-header > div {
+  margin: 0;
+  padding: 0;
+}
+
+.eventos-header h1 {
+  margin: 0;
+  padding: 0;
+
+  font-size: 30px;
+  color: #111827;
+  text-align: left;
+}
+
+.eventos-header p {
+  margin: 8px 0 0 0;
+  padding: 0;
+
+  font-size: 17px;
+  color: #6b7280;
+  text-align: left;
+}
+
+/* ==========================================
+   BOTÓN NUEVO EVENTO
+========================================== */
+
+.btn-nuevo-evento {
+  padding: 11px 18px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #111827;
+  color: white;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.btn-nuevo-evento:hover {
+  background: #1f2937;
+}
+
+
+/* ==========================================
+   FORMULARIO
+========================================== */
+
+.formulario-evento {
+  background: white;
+
+  padding: 25px;
+
+  margin-bottom: 25px;
+
+  border-radius: 12px;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.formulario-evento h2 {
+  margin-top: 0;
+  margin-bottom: 25px;
+
+  font-size: 20px;
+
+  color: #111827;
+}
+
+
+/* ==========================================
+   CAMPOS
+========================================== */
+
+.formulario-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 20px;
+}
+
+.campo-evento {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.campo-evento label {
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #374151;
+}
+
+.campo-evento input,
+.campo-evento select {
+  padding: 10px 12px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 7px;
+
+  font-size: 14px;
+
+  outline: none;
+}
+
+.campo-evento input:focus,
+.campo-evento select:focus {
+  border-color: #6b7280;
+}
+
+
+/* ==========================================
+   BOTONES DEL FORMULARIO
+========================================== */
+
+.formulario-botones {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 25px;
+}
+
+.btn-cancelar {
+  padding: 10px 18px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 7px;
+
+  background: white;
+
+  color: #374151;
+
+  cursor: pointer;
+}
+
+.btn-guardar-evento {
+  padding: 10px 18px;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background: #111827;
+
+  color: white;
+
+  cursor: pointer;
+}
+
+.btn-guardar-evento:hover {
+  background: #1f2937;
+}
+
+.filtro-eventos {
+  display: flex;
+  justify-content: flex-start;
+margin-top: 25px;
+
+  margin-bottom: 20px;
+}
+
+.filtro-eventos input {
+  width: 300px;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  font-size: 14px;
+  outline: none;
+}
+
+.filtro-eventos input:focus {
+  border-color: #6b7280;
+}

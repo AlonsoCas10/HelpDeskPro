@@ -1,0 +1,10 @@
+helpdeskpro-frontend/node_modules/
+helpdeskpro-frontend/dist/
+
+helpdeskpro-backend/target/
+
+.vscode/
+.idea/
+
+*.iml
+.env
