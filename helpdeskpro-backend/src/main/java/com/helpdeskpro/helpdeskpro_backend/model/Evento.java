@@ -1,5 +1,6 @@
-package com.helpdeskpro.helpdeskpro_backend.model;
 
+package com.helpdeskpro.helpdeskpro_backend.model;
+//Importamos las herramientas de JPA
 import jakarta.persistence.*;
 
 @Entity
@@ -11,23 +12,14 @@ public class Evento {
     private Long id;
 
     private String codigo;
-
     private String remitente;
-
     private String destinatario;
-
     private String adjunto;
-
     private String asunto;
-
     private String clasificacion;
-
     private Integer riskScore;
-
     private String estado;
-
     private String fechaHora;
-
 
     public String getCodigo() {
         return codigo;
@@ -37,15 +29,12 @@ public class Evento {
         this.codigo = codigo;
     }
 
-
     public Evento() {
     }
-
 
     public Long getId() {
         return id;
     }
-
 
     public String getRemitente() {
         return remitente;
@@ -55,7 +44,6 @@ public class Evento {
         this.remitente = remitente;
     }
 
-
     public String getDestinatario() {
         return destinatario;
     }
@@ -63,7 +51,6 @@ public class Evento {
     public void setDestinatario(String destinatario) {
         this.destinatario = destinatario;
     }
-
 
     public String getAdjunto() {
         return adjunto;
@@ -73,7 +60,6 @@ public class Evento {
         this.adjunto = adjunto;
     }
 
-
     public String getAsunto() {
         return asunto;
     }
@@ -81,7 +67,6 @@ public class Evento {
     public void setAsunto(String asunto) {
         this.asunto = asunto;
     }
-
 
     public String getClasificacion() {
         return clasificacion;
@@ -91,7 +76,6 @@ public class Evento {
         this.clasificacion = clasificacion;
     }
 
-
     public Integer getRiskScore() {
         return riskScore;
     }
@@ -100,7 +84,6 @@ public class Evento {
         this.riskScore = riskScore;
     }
 
-
     public String getEstado() {
         return estado;
     }
@@ -108,7 +91,6 @@ public class Evento {
     public void setEstado(String estado) {
         this.estado = estado;
     }
-
 
     public String getFechaHora() {
         return fechaHora;
