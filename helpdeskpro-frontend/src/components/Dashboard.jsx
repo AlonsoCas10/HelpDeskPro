@@ -2,6 +2,7 @@
 import '../App.css'
 import Eventos from './Eventos'
 import { useState } from 'react'
+import Configuracion from './Configuracion'
 
 function Dashboard({ usuario, cerrarSesion }) {
 
@@ -48,7 +49,7 @@ function Dashboard({ usuario, cerrarSesion }) {
               Reportes
             </button>
 
-            <button>
+            <button onClick={() => setPagina("configuracion")}>
               Configuracion
             </button>
 
@@ -118,6 +119,10 @@ function Dashboard({ usuario, cerrarSesion }) {
 
   {pagina === "eventos" && (
     <Eventos />
+  )}
+
+  {pagina === "configuracion" && (
+    <Configuracion />
   )}
 
 </main>
