@@ -8,3 +8,26 @@ helpdeskpro-backend/target/
 
 *.iml
 .env
+
+# Node / Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Java / Backend (Maven)
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDEs and OS Files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
