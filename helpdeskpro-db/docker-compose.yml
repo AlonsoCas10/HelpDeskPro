@@ -1,0 +1,16 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: helpdeskpro-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"          # edición gratuita, completa, solo para desarrollo/pruebas
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}   # Docker Compose lee esto de ".env" automáticamente
+    ports:
+      - "1433:1433"                   # mismo puerto que espera tu application.properties
+    volumes:
+      - sqlserver_data:/var/opt/mssql # persiste la base entre reinicios del contenedor
+    restart: unless-stopped
+
+volumes:
+  sqlserver_data:
