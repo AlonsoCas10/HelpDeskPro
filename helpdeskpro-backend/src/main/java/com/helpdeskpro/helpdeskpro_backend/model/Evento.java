@@ -13,6 +13,8 @@ public class Evento {
 
     private String codigo;
     private String remitente;
+    private String dominioRegistrado;
+    private Boolean remitenteConocido;
     private String destinatario;
     private String adjunto;
     private String asunto;
@@ -99,4 +101,21 @@ public class Evento {
     public void setFechaHora(String fechaHora) {
         this.fechaHora = fechaHora;
     }
+
+    public String getDominioRegistrado() {
+        return dominioRegistrado;
+    }
+
+    public void setDominioRegistrado(String dominioRegistrado) {
+        this.dominioRegistrado = dominioRegistrado;
+    }
+
+    public Boolean getRemitenteConocido() {
+        return remitenteConocido;
+    }
+
+    public void setRemitenteConocido(Boolean remitenteConocido) {
+        this.remitenteConocido = remitenteConocido;
+    }
+
 }

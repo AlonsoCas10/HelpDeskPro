@@ -13,7 +13,6 @@ function Eventos() {
   const [adjunto, setAdjunto] = useState("")
   const [asunto, setAsunto] = useState("")
   const [clasificacion, setClasificacion] = useState("")
-  const [riskScore, setRiskScore] = useState("")
   const [estado, setEstado] = useState("")
   const [fechaHora, setFechaHora] = useState("")
 
@@ -29,6 +28,8 @@ function Eventos() {
   
   const [resultado, setResultado] = useState("")
   const [resultadoGuardado, setResultadoGuardado] = useState("")
+
+  const [dominioRegistrado, setDominioRegistrado] = useState("")
 
   // =====================================================
   // OBTENER EVENTOS
@@ -73,11 +74,11 @@ function Eventos() {
       const nuevoEvento = {
 
         remitente: remitente,
+        dominioRegistrado: dominioRegistrado,
         destinatario: destinatario,
         adjunto: adjunto,
         asunto: asunto,
         clasificacion: clasificacion,
-        riskScore: Number(riskScore),
         estado: estado,
         fechaHora: fechaHora
 
@@ -102,11 +103,11 @@ function Eventos() {
       // Limpiar formulario
 
       setRemitente("")
+      setDominioRegistrado("")
       setDestinatario("")
       setAdjunto("")
       setAsunto("")
       setClasificacion("")
-      setRiskScore("")
       setEstado("")
       setFechaHora("")
 
@@ -243,6 +244,23 @@ function Eventos() {
 
                 </div>
 
+                {/* DOMINIO REGISTRADO */}
+
+                <div className="campo-evento">
+
+                  <label>
+                    Dominio registrado
+                  </label>
+
+                  <input
+                    type="text"
+                    placeholder="empresa.com"
+                    value={dominioRegistrado}
+                    onChange={(e) => setDominioRegistrado(e.target.value)}
+                  />
+
+                </div>
+
 
                 {/* DESTINATARIO */}
 
@@ -339,27 +357,6 @@ function Eventos() {
                   </select>
 
                 </div>
-
-
-                {/* RISK SCORE */}
-
-                <div className="campo-evento">
-
-                  <label>
-                    Risk Score
-                  </label>
-
-                  <input
-                    type="number"
-                    placeholder="0 - 100"
-                    min="0"
-                    max="100"
-                    value={riskScore}
-                    onChange={(e) => setRiskScore(e.target.value)}
-                  />
-
-                </div>
-
 
                 {/* ESTADO */}
 
