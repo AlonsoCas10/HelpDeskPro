@@ -36,29 +36,22 @@ function Eventos() {
   // =====================================================
 
   useEffect(() => {
+    let componenteActivo = true
 
-    obtenerEventos()
+    axios.get("http://localhost:8080/eventos")
+      .then((respuesta) => {
+        if (componenteActivo) {
+          setEventos(respuesta.data)
+        }
+      })
+      .catch((error) => {
+        console.error("Error al obtener eventos:", error)
+      })
 
-  }, [])
-
-
-  async function obtenerEventos() {
-
-    try {
-
-      const respuesta = await axios.get(
-        "http://localhost:8080/eventos"
-      )
-
-      setEventos(respuesta.data)
-
-    } catch (error) {
-
-      console.error("Error al obtener eventos:", error)
-
+    return () => {
+      componenteActivo = false
     }
-
-  }
+  }, [])
 
 
   // =====================================================
