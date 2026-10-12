@@ -1,5 +1,5 @@
-package com.helpdeskpro.helpdeskpro_backend.model;
 
+package com.helpdeskpro.helpdeskpro_backend.model;
 import jakarta.persistence.*;
 
 @Entity
