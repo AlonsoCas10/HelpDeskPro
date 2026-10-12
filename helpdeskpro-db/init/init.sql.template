@@ -1,0 +1,27 @@
+-- Plantilla: NO tiene secretos reales, por eso SÍ se sube a git.
+-- Las variables ${DB_NAME} / ${DB_USER} / ${DB_PASSWORD} se rellenan en setup-db.sh
+-- usando los valores reales del archivo .env (que NUNCA se sube a git).
+
+IF DB_ID('${DB_NAME}') IS NULL
+BEGIN
+    CREATE DATABASE ${DB_NAME};
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.server_principals WHERE name = '${DB_USER}')
+BEGIN
+    CREATE LOGIN ${DB_USER} WITH PASSWORD = '${DB_PASSWORD}';
+END
+GO
+
+USE ${DB_NAME};
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = '${DB_USER}')
+BEGIN
+    CREATE USER ${DB_USER} FOR LOGIN ${DB_USER};
+END
+GO
+
+ALTER ROLE db_owner ADD MEMBER ${DB_USER};
+GO

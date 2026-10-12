@@ -1,0 +1,5 @@
+# Contiene contraseñas reales — nunca se sube
+.env
+
+# Se genera temporalmente al correr setup-db.sh y se borra solo, pero por si acaso
+init/init.generated.sql
