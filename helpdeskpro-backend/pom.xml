@@ -72,7 +72,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+<<<<<<< HEAD
 			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+=======
+			<artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
+>>>>>>> ddcf516 (Integración en el backend con AWS Cognito)
 		</dependency>
 	</dependencies>
 
