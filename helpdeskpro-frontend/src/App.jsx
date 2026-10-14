@@ -55,8 +55,8 @@ function App() {
     <div className="login-page">
       <div className="login-container">
         <Logo />
-        <h1>HelpDeskPro</h1>
-        <p className="subtitle">Sistema de soporte TI Alonso</p>
+        <h1>FactSafe</h1>
+        <p className="subtitle">“No solo detectamos amenazas, las interpretamos antes de que afecten a tu negocio.”</p>
         <button type="button" onClick={() => auth.signinRedirect()}>
           Iniciar sesión o registrarse
         </button>
