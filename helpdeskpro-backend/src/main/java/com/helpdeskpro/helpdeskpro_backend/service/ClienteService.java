@@ -1,27 +1,25 @@
 package com.helpdeskpro.helpdeskpro_backend.service;
 
-
-
-import com.helpdeskpro.helpdeskpro_backend.model.ClienteSimulado;
-import com.helpdeskpro.helpdeskpro_backend.repository.ClienteSimuladoRepository;
+import com.helpdeskpro.helpdeskpro_backend.model.Cliente;
+import com.helpdeskpro.helpdeskpro_backend.repository.ClienteRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class ClienteSimuladoService {
+public class ClienteService {
 
-    private final ClienteSimuladoRepository repository;
+    private final ClienteRepository repository;
 
-    public ClienteSimuladoService(ClienteSimuladoRepository repository) {
+    public ClienteService(ClienteRepository repository) {
         this.repository = repository;
     }
 
-    public List<ClienteSimulado> listar() {
+    public List<Cliente> listar() {
         return repository.findAll();
     }
 
-    public ClienteSimulado guardar(ClienteSimulado cliente) {
+    public Cliente guardar(Cliente cliente) {
         return repository.save(cliente);
     }
 
@@ -29,9 +27,9 @@ public class ClienteSimuladoService {
         repository.deleteById(id);
     }
 
-    public ClienteSimulado marcarComoVip(String ruc) {
+    public Cliente marcarComoVip(String ruc) {
 
-        ClienteSimulado cliente = repository.findByRuc(ruc)
+        Cliente cliente = repository.findByRuc(ruc)
                 .orElseThrow(() ->
                         new RuntimeException("Cliente no encontrado con RUC: " + ruc)
                 );

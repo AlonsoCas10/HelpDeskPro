@@ -18,24 +18,30 @@ public class ExcelClienteVipController {
 
     @PostMapping("/importar-vip")
     public ResponseEntity<String> importarClientesVip(
-            @RequestParam("archivo") MultipartFile archivo) {
+            @RequestParam("archivo") MultipartFile archivo,
+            @RequestParam("configuracionEmpresaId") Long configuracionEmpresaId) {
 
         try {
 
-            int actualizados = service.importarClientesVip(archivo);
+            int actualizados =
+                    service.importarClientesVip(
+                            archivo,
+                            configuracionEmpresaId
+                    );
 
             return ResponseEntity.ok(
                     "Importación completada. Clientes VIP actualizados: "
                             + actualizados
             );
 
-    } catch (Exception e) {
+        } catch (Exception e) {
 
-        e.printStackTrace();
+            e.printStackTrace();
 
-        return ResponseEntity.internalServerError().body(
-                "No se pudo procesar el archivo Excel: " + e.getMessage()
-        );
+            return ResponseEntity.internalServerError().body(
+                    "No se pudo procesar el archivo Excel: "
+                            + e.getMessage()
+            );
+        }
     }
-}
 }

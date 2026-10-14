@@ -1,200 +1,498 @@
-
 import { useState } from 'react'
 import '../App.css'
 import axios from 'axios'
+import * as XLSX from 'xlsx'
 
 function Configuracion() {
 
   const [seccion, setSeccion] = useState("")
   const [vistaFactoring, setVistaFactoring] = useState("")
 
-  // ================================
+  // ==========================================
   // INFORMACIÓN DE LA ORGANIZACIÓN
-  // ================================
+  // ==========================================
 
   const [nombreEmpresa, setNombreEmpresa] = useState('')
   const [moneda, setMoneda] = useState('PEN')
   const [umbralMontoRelevante, setUmbralMontoRelevante] = useState('')
-
   const [cantidadColaboradores, setCantidadColaboradores] = useState('')
   const [areasCriticas, setAreasCriticas] = useState('')
-  const [usuariosAreasCriticas, setUsuariosAreasCriticas] = useState('')
-  const [informacionCritica, setInformacionCritica] = useState('')
 
-  // ================================
+  // ==========================================
+  // USUARIOS DE ÁREAS CRÍTICAS
+  // ==========================================
+
+  const [archivoUsuarios, setArchivoUsuarios] = useState(null)
+  const [usuariosExcel, setUsuariosExcel] = useState([])
+  const [mostrarUsuariosExcel, setMostrarUsuariosExcel] = useState(false)
+
+  // ==========================================
   // CONTEXTO OPERATIVO
-  // ================================
+  // ==========================================
 
   const [documentosRecibidosDiariamente, setDocumentosRecibidosDiariamente] = useState('')
   const [promedioOperacionesDiarias, setPromedioOperacionesDiarias] = useState('')
 
-  // ================================
+  // ==========================================
   // CLIENTES
-  // ================================
+  // ==========================================
 
-  const [razonSocialCliente, setRazonSocialCliente] = useState('')
-  const [rucCliente, setRucCliente] = useState('')
-  const [clienteVip, setClienteVip] = useState(false)
+  const [archivoClientes, setArchivoClientes] = useState(null)
+  const [clientesExcel, setClientesExcel] = useState([])
+  const [mostrarClientes, setMostrarClientes] = useState(false)
 
-  // ================================
+  // ==========================================
   // DEUDORES
-  // ================================
+  // ==========================================
 
-  const [razonSocialDeudor, setRazonSocialDeudor] = useState('')
-  const [rucDeudor, setRucDeudor] = useState('')
+  const [archivoDeudores, setArchivoDeudores] = useState(null)
+  const [deudoresExcel, setDeudoresExcel] = useState([])
+  const [mostrarDeudores, setMostrarDeudores] = useState(false)
 
-  // ================================
-  // FACTURAS
-  // ================================
-
-  const [numeroFactura, setNumeroFactura] = useState('')
-  const [rucClienteFactura, setRucClienteFactura] = useState('')
-  const [rucDeudorFactura, setRucDeudorFactura] = useState('')
-  const [montoFactura, setMontoFactura] = useState('')
-  const [monedaFactura, setMonedaFactura] = useState('PEN')
-  const [estadoFactura, setEstadoFactura] = useState('Pendiente')
-
-  // ================================
+  // ==========================================
   // PERFIL DE RIESGO
-  // ================================
-
-  const [tieneClientesVip, setTieneClientesVip] = useState("")
+  // ==========================================
 
   const [perdidaVipMin, setPerdidaVipMin] = useState('')
   const [perdidaVipMax, setPerdidaVipMax] = useState('')
-
   const [perdidaNoVipMin, setPerdidaNoVipMin] = useState('')
   const [perdidaNoVipMax, setPerdidaNoVipMax] = useState('')
-
-  const [situacionesRiesgosas, setSituacionesRiesgosas] = useState('')
-
-  // Archivo actualmente seleccionado
-  const [archivoClientesVip, setArchivoClientesVip] = useState(null)
-
-  // Indica si ya se realizó correctamente la importación
-  const [clientesVipImportados, setClientesVipImportados] = useState(false)
+  const [situacionesRiesgosas, setSituacionesRiesgosas] = useState("")
 
 
-  // ================================
+  // ==========================================
+  // LEER EXCEL DE USUARIOS
+  // ==========================================
+
+  const seleccionarExcelUsuarios = async (archivo) => {
+
+    if (!archivo) return
+
+    setArchivoUsuarios(archivo)
+    setMostrarUsuariosExcel(false)
+    setUsuariosExcel([])
+
+    try {
+
+      const datos = await archivo.arrayBuffer()
+
+      const libro = XLSX.read(datos, {
+        type: "array"
+      })
+
+      if (!libro.SheetNames.length) {
+        throw new Error("El archivo no contiene hojas.")
+      }
+
+      const nombrePrimeraHoja = libro.SheetNames[0]
+      const hoja = libro.Sheets[nombrePrimeraHoja]
+
+      const datosExcel = XLSX.utils.sheet_to_json(
+        hoja,
+        {
+          defval: ""
+        }
+      )
+
+      setUsuariosExcel(datosExcel)
+
+    } catch (error) {
+
+      console.error(
+        "Error al leer el Excel de usuarios:",
+        error
+      )
+
+      setArchivoUsuarios(null)
+      setUsuariosExcel([])
+
+      alert(
+        "No se pudo leer el archivo Excel de usuarios."
+      )
+    }
+  }
+
+
+  // ==========================================
+  // LEER EXCEL DE CLIENTES
+  // ==========================================
+
+  const seleccionarExcelClientes = async (archivo) => {
+
+    if (!archivo) return
+
+    setArchivoClientes(archivo)
+    setMostrarClientes(false)
+    setClientesExcel([])
+
+    try {
+
+      const datos = await archivo.arrayBuffer()
+
+      const libro = XLSX.read(datos, {
+        type: "array"
+      })
+
+      if (!libro.SheetNames.length) {
+        throw new Error("El archivo no contiene hojas.")
+      }
+
+      const nombrePrimeraHoja = libro.SheetNames[0]
+      const hoja = libro.Sheets[nombrePrimeraHoja]
+
+      const datosExcel = XLSX.utils.sheet_to_json(
+        hoja,
+        {
+          defval: ""
+        }
+      )
+
+      setClientesExcel(datosExcel)
+
+    } catch (error) {
+
+      console.error(
+        "Error al leer el Excel de clientes:",
+        error
+      )
+
+      setArchivoClientes(null)
+      setClientesExcel([])
+
+      alert(
+        "No se pudo leer el archivo Excel de clientes."
+      )
+    }
+  }
+
+
+  // ==========================================
+  // LEER EXCEL DE DEUDORES
+  // ==========================================
+
+  const seleccionarExcelDeudores = async (archivo) => {
+
+    if (!archivo) return
+
+    setArchivoDeudores(archivo)
+    setMostrarDeudores(false)
+    setDeudoresExcel([])
+
+    try {
+
+      const datos = await archivo.arrayBuffer()
+
+      const libro = XLSX.read(datos, {
+        type: "array"
+      })
+
+      if (!libro.SheetNames.length) {
+        throw new Error("El archivo no contiene hojas.")
+      }
+
+      const nombrePrimeraHoja = libro.SheetNames[0]
+      const hoja = libro.Sheets[nombrePrimeraHoja]
+
+      const datosExcel = XLSX.utils.sheet_to_json(
+        hoja,
+        {
+          defval: ""
+        }
+      )
+
+      setDeudoresExcel(datosExcel)
+
+    } catch (error) {
+
+      console.error(
+        "Error al leer el Excel de deudores:",
+        error
+      )
+
+      setArchivoDeudores(null)
+      setDeudoresExcel([])
+
+      alert(
+        "No se pudo leer el archivo Excel de deudores."
+      )
+    }
+  }
+
+
+  // ==========================================
   // GUARDAR CONFIGURACIÓN
-  // ================================
+  // ==========================================
 
   const guardarConfiguracion = async () => {
 
-    // --------------------------------
-    // VALIDAR CAMPOS GENERALES
-    // --------------------------------
+    // ------------------------------------------
+    // VALIDAR CAMPOS
+    // ------------------------------------------
 
     if (
-      !nombreEmpresa.trim() ||
+      !nombreEmpresa ||
       !moneda ||
       !umbralMontoRelevante ||
       !cantidadColaboradores ||
-      !areasCriticas.trim() ||
-      !usuariosAreasCriticas.trim() ||
-      !informacionCritica.trim() ||
-      !documentosRecibidosDiariamente.trim() ||
+      !areasCriticas ||
+      !documentosRecibidosDiariamente ||
       !promedioOperacionesDiarias ||
       !perdidaVipMin ||
       !perdidaVipMax ||
       !perdidaNoVipMin ||
       !perdidaNoVipMax ||
-      !situacionesRiesgosas.trim()
+      !situacionesRiesgosas
     ) {
-      alert("Completa todos los campos obligatorios.")
-      return
-    }
 
-    // --------------------------------
-    // VALIDAR SI TIENE CLIENTES VIP
-    // --------------------------------
-
-    if (!tieneClientesVip) {
-      alert("Indica si la empresa tiene clientes VIP.")
-      return
-    }
-
-    // --------------------------------
-    // SI TIENE VIP, DEBE IMPORTAR EXCEL
-    // --------------------------------
-
-    if (tieneClientesVip === "si" && !clientesVipImportados) {
-      alert("Debes importar el Excel de clientes VIP antes de guardar la configuración.")
-      return
-    }
-
-    // --------------------------------
-    // VALIDAR RANGO VIP
-    // --------------------------------
-
-    if (Number(perdidaVipMax) < Number(perdidaVipMin)) {
       alert(
-        "La pérdida máxima de clientes VIP no puede ser menor que la mínima."
+        "Completa todos los campos obligatorios antes de guardar."
       )
+
       return
     }
 
-    // --------------------------------
-    // VALIDAR RANGO NO VIP
-    // --------------------------------
 
-    if (Number(perdidaNoVipMax) < Number(perdidaNoVipMin)) {
+    // ------------------------------------------
+    // VALIDAR PÉRDIDA VIP
+    // ------------------------------------------
+
+    if (
+      Number(perdidaVipMax) <
+      Number(perdidaVipMin)
+    ) {
+
       alert(
-        "La pérdida máxima de clientes o áreas no VIP no puede ser menor que la mínima."
+        "La pérdida potencial máxima para clientes VIP no puede ser menor que la mínima."
       )
+
       return
     }
 
-    // --------------------------------
-    // ENVIAR CONFIGURACIÓN AL BACKEND
-    // --------------------------------
+
+    // ------------------------------------------
+    // VALIDAR PÉRDIDA NO VIP
+    // ------------------------------------------
+
+    if (
+      Number(perdidaNoVipMax) <
+      Number(perdidaNoVipMin)
+    ) {
+
+      alert(
+        "La pérdida potencial máxima para clientes no VIP no puede ser menor que la mínima."
+      )
+
+      return
+    }
+
+
+    // ------------------------------------------
+    // VALIDAR USUARIOS DEL EXCEL
+    // ------------------------------------------
+
+    const usuariosParaGuardar =
+      usuariosExcel.map((usuario) => ({
+
+        nombre: String(
+          usuario.nombre ??
+          usuario.Nombre ??
+          ""
+        ).trim(),
+
+        correo: String(
+          usuario.correo ??
+          usuario.Correo ??
+          ""
+        ).trim(),
+
+        area: String(
+          usuario.area ??
+          usuario.Area ??
+          ""
+        ).trim()
+
+      }))
+
+
+    if (
+      usuariosParaGuardar.length === 0 ||
+      usuariosParaGuardar.some(
+        (usuario) =>
+          !usuario.nombre ||
+          !usuario.correo ||
+          !usuario.area
+      )
+    ) {
+
+      alert(
+        "El Excel de usuarios debe contener las columnas nombre, correo y area, y todos los registros deben tener datos."
+      )
+
+      return
+    }
+
 
     try {
 
-      const respuesta = await axios.post(
+      // ==========================================
+      // 1. GUARDAR CONFIGURACIÓN GENERAL
+      // ==========================================
+
+      const respuestaConfiguracion = await axios.post(
         "http://localhost:8080/configuracion",
         {
-          nombreEmpresa: nombreEmpresa,
-          moneda: moneda,
-          umbralMontoRelevante: Number(umbralMontoRelevante),
 
-          cantidadColaboradores: Number(cantidadColaboradores),
-          areasCriticas: areasCriticas,
-          usuariosAreasCriticas: usuariosAreasCriticas,
-          informacionCritica: informacionCritica,
+          nombreEmpresa,
 
-          documentosRecibidosDiariamente:
-            documentosRecibidosDiariamente,
+          moneda,
+
+          umbralMontoRelevante:
+            Number(
+              umbralMontoRelevante
+            ),
+
+          cantidadColaboradores:
+            Number(
+              cantidadColaboradores
+            ),
+
+          areasCriticas,
+
+          documentosRecibidosDiariamente,
 
           promedioOperacionesDiarias:
-            Number(promedioOperacionesDiarias),
+            Number(
+              promedioOperacionesDiarias
+            ),
 
-          // "si" o "no"
-          clientesVip: tieneClientesVip,
+          perdidaMinVip:
+            Number(
+              perdidaVipMin
+            ),
 
-          perdidaVipMin:
-            Number(perdidaVipMin),
+          perdidaMaxVip:
+            Number(
+              perdidaVipMax
+            ),
 
-          perdidaVipMax:
-            Number(perdidaVipMax),
+          perdidaMinNoVip:
+            Number(
+              perdidaNoVipMin
+            ),
 
-          perdidaNoVipMin:
-            Number(perdidaNoVipMin),
+          perdidaMaxNoVip:
+            Number(
+              perdidaNoVipMax
+            ),
 
-          perdidaNoVipMax:
-            Number(perdidaNoVipMax),
+          situacionesRiesgosas
 
-          situacionesRiesgosas:
-            situacionesRiesgosas
         }
       )
 
-      console.log(
-        "Configuración guardada:",
-        respuesta.data
-      )
 
-      alert("Configuración guardada correctamente.")
+      const configuracionEmpresaId =
+        respuestaConfiguracion.data.id
+
+
+      // ==========================================
+      // 2. GUARDAR USUARIOS CRÍTICOS
+      // ==========================================
+
+      for (
+        const usuario of usuariosParaGuardar
+      ) {
+
+        await axios.post(
+          "http://localhost:8080/usuarios-criticos",
+          {
+
+            nombre: usuario.nombre,
+
+            correo: usuario.correo,
+
+            area: usuario.area,
+
+            configuracionEmpresa: {
+              id: configuracionEmpresaId
+            }
+
+          }
+        )
+      }
+
+
+      // ==========================================
+      // 3. GUARDAR CLIENTES
+      // ==========================================
+
+      if (archivoClientes) {
+
+        const datosClientes =
+          new FormData()
+
+        datosClientes.append(
+          "archivo",
+          archivoClientes
+        )
+
+        datosClientes.append(
+          "configuracionEmpresaId",
+          configuracionEmpresaId
+        )
+
+        await axios.post(
+          "http://localhost:8080/clientes/importar-vip",
+          datosClientes,
+          {
+            headers: {
+              "Content-Type":
+                "multipart/form-data"
+            }
+          }
+        )
+      }
+
+
+      // ==========================================
+      // 4. GUARDAR DEUDORES
+      // ==========================================
+
+      if (archivoDeudores) {
+
+        const datosDeudores =
+          new FormData()
+
+        datosDeudores.append(
+          "archivo",
+          archivoDeudores
+        )
+
+        datosDeudores.append(
+            "configuracionEmpresaId",
+            configuracionEmpresaId
+        )
+
+        await axios.post(
+          "http://localhost:8080/deudores/importar",
+          datosDeudores,
+          {
+            headers: {
+              "Content-Type":
+                "multipart/form-data"
+            }
+          }
+        )
+      }
+
+
+      // ==========================================
+      // ÉXITO
+      // ==========================================
+
+      alert(
+        "Configuración guardada correctamente."
+      )
 
     } catch (error) {
 
@@ -203,250 +501,50 @@ function Configuracion() {
         error
       )
 
-      alert("No se pudo guardar la configuración.")
-    }
-  }
-
-
-  // ================================
-  // GUARDAR CLIENTE
-  // ================================
-
-  const guardarCliente = async () => {
-
-    if (
-      !razonSocialCliente.trim() ||
-      !rucCliente.trim()
-    ) {
-      alert("Completa la razón social y el RUC.")
-      return
-    }
-
-    try {
-
-      const respuesta = await axios.post(
-        "http://localhost:8080/clientes",
-        {
-          razonSocial: razonSocialCliente,
-          ruc: rucCliente,
-          vip: clienteVip
-        }
-      )
-
-      console.log(
-        "Cliente guardado:",
-        respuesta.data
-      )
-
-      alert("Cliente guardado correctamente.")
-
-      setRazonSocialCliente('')
-      setRucCliente('')
-      setClienteVip(false)
-
-    } catch (error) {
-
       console.error(
-        "Error al guardar cliente:",
-        error
+        "Respuesta del servidor:",
+        error.response?.data
       )
-
-      alert("No se pudo guardar el cliente.")
-    }
-  }
-
-
-  // ================================
-  // GUARDAR DEUDOR
-  // ================================
-
-  const guardarDeudor = async () => {
-
-    if (
-      !razonSocialDeudor.trim() ||
-      !rucDeudor.trim()
-    ) {
-      alert("Completa la razón social y el RUC.")
-      return
-    }
-
-    try {
-
-      const respuesta = await axios.post(
-        "http://localhost:8080/deudores",
-        {
-          razonSocial: razonSocialDeudor,
-          ruc: rucDeudor
-        }
-      )
-
-      console.log(
-        "Deudor guardado:",
-        respuesta.data
-      )
-
-      alert("Deudor guardado correctamente.")
-
-      setRazonSocialDeudor('')
-      setRucDeudor('')
-
-    } catch (error) {
-
-      console.error(
-        "Error al guardar deudor:",
-        error
-      )
-
-      alert("No se pudo guardar el deudor.")
-    }
-  }
-
-
-  // ================================
-  // GUARDAR FACTURA
-  // ================================
-
-  const guardarFactura = async () => {
-
-    if (
-      !numeroFactura.trim() ||
-      !rucClienteFactura.trim() ||
-      !rucDeudorFactura.trim() ||
-      !montoFactura ||
-      !monedaFactura ||
-      !estadoFactura
-    ) {
-      alert("Completa todos los campos de la factura.")
-      return
-    }
-
-    try {
-
-      const respuesta = await axios.post(
-        "http://localhost:8080/facturas",
-        {
-          numeroFactura: numeroFactura,
-          rucCliente: rucClienteFactura,
-          rucDeudor: rucDeudorFactura,
-          monto: Number(montoFactura),
-          moneda: monedaFactura,
-          estado: estadoFactura
-        }
-      )
-
-      console.log(
-        "Factura guardada:",
-        respuesta.data
-      )
-
-      alert("Factura guardada correctamente.")
-
-      setNumeroFactura('')
-      setRucClienteFactura('')
-      setRucDeudorFactura('')
-      setMontoFactura('')
-      setMonedaFactura('PEN')
-      setEstadoFactura('Pendiente')
-
-    } catch (error) {
-
-      console.error(
-        "Error al guardar factura:",
-        error
-      )
-
-      alert("No se pudo guardar la factura.")
-    }
-  }
-
-
-  // ================================
-  // IMPORTAR EXCEL CLIENTES VIP
-  // ================================
-
-  const importarClientesVip = async () => {
-
-    if (!archivoClientesVip) {
-      alert("Selecciona un archivo Excel.")
-      return
-    }
-
-    const datos = new FormData()
-
-    datos.append(
-      "archivo",
-      archivoClientesVip
-    )
-
-    try {
-
-      const respuesta = await axios.post(
-        "http://localhost:8080/clientes/importar-vip",
-        datos,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        }
-      )
-
-      console.log(
-        "Importación:",
-        respuesta.data
-      )
-
-      alert(respuesta.data)
-
-      // IMPORTANTE:
-      // Indicamos que el Excel ya fue importado
-      setClientesVipImportados(true)
-
-      // Limpiamos solamente el archivo seleccionado
-      setArchivoClientesVip(null)
-
-    } catch (error) {
-
-      console.error(
-        "Error al importar clientes VIP:",
-        error
-      )
-
-      // Si falla la importación,
-      // seguimos considerando que no se importó
-      setClientesVipImportados(false)
 
       alert(
-        "No se pudo importar el archivo Excel."
+        "No se pudo guardar la configuración."
       )
     }
   }
 
+
+  // ==========================================
+  // INTERFAZ
+  // ==========================================
 
   return (
 
     <div className="configuracion-container">
 
-      {/* ===================================== */}
-      {/* CABECERA */}
-      {/* ===================================== */}
+
+      {/* ======================================
+          ENCABEZADO
+      ======================================= */}
 
       <div className="configuracion-header">
 
-        <div>
-          <h1>Configuración</h1>
+        <h1>
+          Configuración
+        </h1>
 
-          <p>
-            Configura los parámetros de seguridad,
-            organización y contexto de factoring.
-          </p>
-        </div>
+        <p>
+          Configure la información de su
+          organización y los parámetros
+          utilizados para la evaluación
+          de riesgos.
+        </p>
 
       </div>
 
 
-      {/* ===================================== */}
-      {/* MENÚ PRINCIPAL */}
-      {/* ===================================== */}
+      {/* ======================================
+          PESTAÑAS PRINCIPALES
+      ======================================= */}
 
       <div className="configuracion-tabs">
 
@@ -463,6 +561,7 @@ function Configuracion() {
           Integraciones
         </button>
 
+
         <button
           className={
             seccion === "usuarios"
@@ -475,6 +574,7 @@ function Configuracion() {
         >
           Usuarios y Roles
         </button>
+
 
         <button
           className={
@@ -492,106 +592,124 @@ function Configuracion() {
       </div>
 
 
-      {/* ===================================== */}
-      {/* INTEGRACIONES */}
-      {/* ===================================== */}
+      {/* ======================================
+          TARJETA PRINCIPAL
+      ======================================= */}
 
-      {seccion === "integraciones" && (
-
-        <div className="configuracion-card">
-
-          <h2>Integraciones</h2>
-
-          <p>
-            Configura las plataformas que utilizará
-            el sistema para analizar los eventos.
-          </p>
-
-          <div className="asistente-campo">
-
-            <label>
-              Microsoft 365
-            </label>
-
-            <button type="button">
-              Conectar
-            </button>
-
-          </div>
-
-          <div className="asistente-campo">
-
-            <label>
-              Google Workspace
-            </label>
-
-            <button type="button">
-              Conectar
-            </button>
-
-          </div>
-
-        </div>
-
-      )}
+      <div className="configuracion-card">
 
 
-      {/* ===================================== */}
-      {/* USUARIOS Y ROLES */}
-      {/* ===================================== */}
+        {/* ====================================
+            INTEGRACIONES
+        ===================================== */}
 
-      {seccion === "usuarios" && (
+        {seccion === "integraciones" && (
 
-        <div className="configuracion-card">
+          <div className="asistente-datos">
 
-          <h2>Usuarios y Roles</h2>
+            <div className="asistente-header">
 
-          <p>
-            Administra los usuarios y permisos
-            de la plataforma.
-          </p>
+              <h2>
+                Integraciones
+              </h2>
 
-        </div>
+              <p>
+                Conecte las herramientas
+                utilizadas por su organización.
+              </p>
 
-      )}
+            </div>
 
 
-      {/* ===================================== */}
-      {/* ASISTENTE DE DATOS */}
-      {/* ===================================== */}
+            <div className="asistente-campo">
 
-      {seccion === "asistente" && (
+              <label>
+                Microsoft 365
+              </label>
 
-        <div className="asistente-datos">
+              <button>
+                Conectar
+              </button>
 
-          <div className="asistente-header">
+            </div>
 
-            <h2>
-              Asistente de datos
-            </h2>
 
-            <p>
-              Responde las siguientes preguntas para
-              personalizar el análisis y mejorar la
-              detección de riesgos según el contexto
-              de tu organización.
-            </p>
+            <div className="asistente-campo">
+
+              <label>
+                Google Workspace
+              </label>
+
+              <button>
+                Conectar
+              </button>
+
+            </div>
 
           </div>
 
+        )}
 
-          {/* ===================================== */}
-          {/* INFORMACIÓN DE LA ORGANIZACIÓN */}
-          {/* ===================================== */}
 
-          <div className="configuracion-card">
+        {/* ====================================
+            USUARIOS Y ROLES
+        ===================================== */}
 
-            <h2>
+        {seccion === "usuarios" && (
+
+          <div className="asistente-datos">
+
+            <div className="asistente-header">
+
+              <h2>
+                Usuarios y Roles
+              </h2>
+
+              <p>
+                La administración de usuarios
+                se encuentra disponible desde
+                el módulo correspondiente.
+              </p>
+
+            </div>
+
+          </div>
+
+        )}
+
+
+        {/* ====================================
+            ASISTENTE DE DATOS
+        ===================================== */}
+
+        {seccion === "asistente" && (
+
+          <div className="asistente-datos">
+
+
+            <div className="asistente-header">
+
+              <h2>
+                Asistente de datos
+              </h2>
+
+              <p>
+                Configure los datos necesarios
+                para evaluar los riesgos de
+                ciberseguridad de la organización.
+              </p>
+
+            </div>
+
+
+            {/* ==================================
+                INFORMACIÓN DE LA ORGANIZACIÓN
+            =================================== */}
+
+            <h3>
               Información de la organización
-            </h2>
+            </h3>
 
-
-            {/* NOMBRE EMPRESA */}
 
             <div className="asistente-campo">
 
@@ -603,43 +721,43 @@ function Configuracion() {
                 type="text"
                 value={nombreEmpresa}
                 onChange={(e) =>
-                  setNombreEmpresa(e.target.value)
+                  setNombreEmpresa(
+                    e.target.value
+                  )
                 }
-                placeholder="Ejemplo: Factoring ABC S.A.C."
+                placeholder="Ingrese el nombre de la empresa"
               />
 
             </div>
 
 
-            {/* MONEDA */}
-
             <div className="asistente-campo">
 
               <label>
-                Moneda *
+                Moneda principal *
               </label>
 
               <select
                 value={moneda}
                 onChange={(e) =>
-                  setMoneda(e.target.value)
+                  setMoneda(
+                    e.target.value
+                  )
                 }
               >
 
                 <option value="PEN">
-                  Sol peruano (PEN)
+                  Soles (PEN)
                 </option>
 
                 <option value="USD">
-                  Dólar estadounidense (USD)
+                  Dólares (USD)
                 </option>
 
               </select>
 
             </div>
 
-
-            {/* UMBRAL */}
 
             <div className="asistente-campo">
 
@@ -649,826 +767,793 @@ function Configuracion() {
 
               <input
                 type="number"
-                min="0"
                 value={umbralMontoRelevante}
                 onChange={(e) =>
                   setUmbralMontoRelevante(
                     e.target.value
                   )
                 }
-                placeholder="Ejemplo: 50000"
+                placeholder="Ej. 50000"
               />
 
             </div>
 
 
-            {/* COLABORADORES */}
-
             <div className="asistente-campo">
 
               <label>
-                ¿Cuántos colaboradores tiene la empresa? *
+                Cantidad de colaboradores *
               </label>
 
               <input
                 type="number"
-                min="1"
                 value={cantidadColaboradores}
                 onChange={(e) =>
                   setCantidadColaboradores(
                     e.target.value
                   )
                 }
-                placeholder="Ingrese la cantidad"
+                placeholder="Ej. 50"
               />
 
             </div>
 
 
-            {/* ÁREAS CRÍTICAS */}
-
             <div className="asistente-campo">
 
               <label>
-                ¿Cuáles son las áreas críticas de la organización? *
+                ¿Cuál es el área crítica
+                de la organización? *
               </label>
 
-              <textarea
+              <select
                 value={areasCriticas}
                 onChange={(e) =>
-                  setAreasCriticas(e.target.value)
-                }
-                placeholder="Ejemplo: Finanzas, TI, Contabilidad"
-              />
-
-            </div>
-
-
-            {/* USUARIOS */}
-
-            <div className="asistente-campo">
-
-              <label>
-                ¿Qué usuarios pertenecen a las áreas críticas? *
-              </label>
-
-              <textarea
-                value={usuariosAreasCriticas}
-                onChange={(e) =>
-                  setUsuariosAreasCriticas(
+                  setAreasCriticas(
                     e.target.value
                   )
                 }
-                placeholder="Ingrese los usuarios"
-              />
+              >
+
+                <option value="">
+                  Seleccione un área
+                </option>
+
+                <option value="Finanzas">
+                  Finanzas
+                </option>
+
+                <option value="Contabilidad">
+                  Contabilidad
+                </option>
+
+                <option value="Tesorería">
+                  Tesorería
+                </option>
+
+                <option value="Operaciones">
+                  Operaciones
+                </option>
+
+                <option value="TI">
+                  Tecnología de la Información
+                </option>
+
+                <option value="Riesgos">
+                  Riesgos
+                </option>
+
+                <option value="Créditos">
+                  Créditos
+                </option>
+
+                <option value="Cobranzas">
+                  Cobranzas
+                </option>
+
+                <option value="Administración">
+                  Administración
+                </option>
+
+                <option value="Legal">
+                  Legal
+                </option>
+
+              </select>
 
             </div>
 
 
-            {/* INFORMACIÓN CRÍTICA */}
+            {/* ==================================
+                USUARIOS DE ÁREAS CRÍTICAS
+            =================================== */}
+
+            <h3>
+              Usuarios de áreas críticas
+            </h3>
+
 
             <div className="asistente-campo">
 
               <label>
-                ¿Qué información considera crítica? *
+                Cargar usuarios desde Excel *
               </label>
 
-              <textarea
-                value={informacionCritica}
-                onChange={(e) =>
-                  setInformacionCritica(
-                    e.target.value
-                  )
-                }
-                placeholder="Ejemplo: facturas, cuentas bancarias, datos de clientes"
-              />
-
-            </div>
-
-          </div>
-
-
-          {/* ===================================== */}
-          {/* CONTEXTO OPERATIVO */}
-          {/* ===================================== */}
-
-          <div className="configuracion-card">
-
-            <h2>
-              Contexto operativo
-            </h2>
-
-
-            {/* DOCUMENTOS */}
-
-            <div className="asistente-campo">
-
-              <label>
-                ¿Qué tipo de documentos recibe diariamente? *
-              </label>
-
-              <textarea
-                value={documentosRecibidosDiariamente}
-                onChange={(e) =>
-                  setDocumentosRecibidosDiariamente(
-                    e.target.value
-                  )
-                }
-                placeholder="Ejemplo: facturas, órdenes de compra, contratos, estados de cuenta"
-              />
-
-            </div>
-
-
-            {/* OPERACIONES */}
-
-            <div className="asistente-campo">
-
-              <label>
-                Promedio de operaciones al día *
-              </label>
 
               <input
-                type="number"
-                min="0"
-                value={promedioOperacionesDiarias}
+                type="file"
+                accept=".xlsx,.xls"
+                id="excel-usuarios"
                 onChange={(e) =>
-                  setPromedioOperacionesDiarias(
-                    e.target.value
+                  seleccionarExcelUsuarios(
+                    e.target.files[0]
                   )
                 }
-                placeholder="Ingrese la cantidad"
+                hidden
               />
 
-            </div>
 
-          </div>
-
-
-          {/* ===================================== */}
-          {/* CONTEXTO FACTORING */}
-          {/* ===================================== */}
-
-          <div className="configuracion-card">
-
-            <h2>
-              Contexto factoring
-            </h2>
-
-            <p>
-              Administra la información relacionada
-              con clientes, deudores y facturas.
-            </p>
-
-
-            <div className="factoring-opciones">
-
-              <button
-                type="button"
-                onClick={() =>
-                  setVistaFactoring("clientes")
-                }
+              <label
+                htmlFor="excel-usuarios"
+                className="boton-secundario"
               >
-                Clientes
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setVistaFactoring("deudores")
-                }
-              >
-                Deudores
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setVistaFactoring("facturas")
-                }
-              >
-                Facturas
-              </button>
-
-            </div>
-
-
-            {/* ================================= */}
-            {/* CLIENTES */}
-            {/* ================================= */}
-
-            {vistaFactoring === "clientes" && (
-
-              <div className="factoring-form">
-
-                <h3>
-                  Registrar cliente
-                </h3>
-
-
-                <div className="asistente-campo">
-
-                  <label>
-                    Razón social *
-                  </label>
-
-                  <input
-                    type="text"
-                    value={razonSocialCliente}
-                    onChange={(e) =>
-                      setRazonSocialCliente(
-                        e.target.value
-                      )
-                    }
-                    placeholder="Razón social"
-                  />
-
-                </div>
-
-
-                <div className="asistente-campo">
-
-                  <label>
-                    RUC *
-                  </label>
-
-                  <input
-                    type="text"
-                    value={rucCliente}
-                    onChange={(e) =>
-                      setRucCliente(
-                        e.target.value
-                      )
-                    }
-                    placeholder="RUC"
-                  />
-
-                </div>
-
-
-                <div className="asistente-campo">
-
-                  <label>
-                    ¿Es cliente VIP?
-                  </label>
-
-                  <select
-                    value={clienteVip}
-                    onChange={(e) =>
-                      setClienteVip(
-                        e.target.value === "true"
-                      )
-                    }
-                  >
-
-                    <option value="false">
-                      No
-                    </option>
-
-                    <option value="true">
-                      Sí
-                    </option>
-
-                  </select>
-
-                </div>
-
-
-                <button
-                  type="button"
-                  onClick={guardarCliente}
-                >
-                  Guardar cliente
-                </button>
-
-              </div>
-
-            )}
-
-
-            {/* ================================= */}
-            {/* DEUDORES */}
-            {/* ================================= */}
-
-            {vistaFactoring === "deudores" && (
-
-              <div className="factoring-form">
-
-                <h3>
-                  Registrar deudor
-                </h3>
-
-
-                <div className="asistente-campo">
-
-                  <label>
-                    Razón social *
-                  </label>
-
-                  <input
-                    type="text"
-                    value={razonSocialDeudor}
-                    onChange={(e) =>
-                      setRazonSocialDeudor(
-                        e.target.value
-                      )
-                    }
-                    placeholder="Razón social"
-                  />
-
-                </div>
-
-
-                <div className="asistente-campo">
-
-                  <label>
-                    RUC *
-                  </label>
-
-                  <input
-                    type="text"
-                    value={rucDeudor}
-                    onChange={(e) =>
-                      setRucDeudor(
-                        e.target.value
-                      )
-                    }
-                    placeholder="RUC"
-                  />
-
-                </div>
-
-
-                <button
-                  type="button"
-                  onClick={guardarDeudor}
-                >
-                  Guardar deudor
-                </button>
-
-              </div>
-
-            )}
-
-
-            {/* ================================= */}
-            {/* FACTURAS */}
-            {/* ================================= */}
-
-            {vistaFactoring === "facturas" && (
-
-              <div className="factoring-form">
-
-                <h3>
-                  Registrar factura
-                </h3>
-
-
-                <div className="asistente-campo">
-
-                  <label>
-                    Número de factura *
-                  </label>
-
-                  <input
-                    type="text"
-                    value={numeroFactura}
-                    onChange={(e) =>
-                      setNumeroFactura(
-                        e.target.value
-                      )
-                    }
-                    placeholder="Ejemplo: F001-000123"
-                  />
-
-                </div>
-
-
-                <div className="asistente-campo">
-
-                  <label>
-                    RUC del cliente *
-                  </label>
-
-                  <input
-                    type="text"
-                    value={rucClienteFactura}
-                    onChange={(e) =>
-                      setRucClienteFactura(
-                        e.target.value
-                      )
-                    }
-                    placeholder="RUC del cliente"
-                  />
-
-                </div>
-
-
-                <div className="asistente-campo">
-
-                  <label>
-                    RUC del deudor *
-                  </label>
-
-                  <input
-                    type="text"
-                    value={rucDeudorFactura}
-                    onChange={(e) =>
-                      setRucDeudorFactura(
-                        e.target.value
-                      )
-                    }
-                    placeholder="RUC del deudor"
-                  />
-
-                </div>
-
-
-                <div className="asistente-campo">
-
-                  <label>
-                    Monto *
-                  </label>
-
-                  <input
-                    type="number"
-                    min="0"
-                    value={montoFactura}
-                    onChange={(e) =>
-                      setMontoFactura(
-                        e.target.value
-                      )
-                    }
-                    placeholder="Ejemplo: 25000"
-                  />
-
-                </div>
-
-
-                <div className="asistente-campo">
-
-                  <label>
-                    Moneda *
-                  </label>
-
-                  <select
-                    value={monedaFactura}
-                    onChange={(e) =>
-                      setMonedaFactura(
-                        e.target.value
-                      )
-                    }
-                  >
-
-                    <option value="PEN">
-                      PEN
-                    </option>
-
-                    <option value="USD">
-                      USD
-                    </option>
-
-                  </select>
-
-                </div>
-
-
-                <div className="asistente-campo">
-
-                  <label>
-                    Estado *
-                  </label>
-
-                  <select
-                    value={estadoFactura}
-                    onChange={(e) =>
-                      setEstadoFactura(
-                        e.target.value
-                      )
-                    }
-                  >
-
-                    <option value="Pendiente">
-                      Pendiente
-                    </option>
-
-                    <option value="Pagada">
-                      Pagada
-                    </option>
-
-                    <option value="Vencida">
-                      Vencida
-                    </option>
-
-                  </select>
-
-                </div>
-
-
-                <button
-                  type="button"
-                  onClick={guardarFactura}
-                >
-                  Guardar factura
-                </button>
-
-              </div>
-
-            )}
-
-          </div>
-
-
-          {/* ===================================== */}
-          {/* PERFIL DE RIESGO */}
-          {/* ===================================== */}
-
-          <div className="configuracion-card">
-
-            <h2>
-              Perfil de riesgo
-            </h2>
-
-
-            {/* ================================= */}
-            {/* CLIENTES VIP */}
-            {/* ================================= */}
-
-            <div className="asistente-campo">
-
-              <label>
-                ¿La empresa tiene clientes VIP? *
+                Seleccionar Excel
               </label>
 
 
-              <div className="opciones-radio">
+              {archivoUsuarios && (
 
-                <label>
+                <p>
 
-                  <input
-                    type="radio"
-                    name="clientesVip"
-                    value="si"
-                    checked={
-                      tieneClientesVip === "si"
-                    }
-                    onChange={(e) => {
+                  Archivo seleccionado:{" "}
 
-                      setTieneClientesVip(
-                        e.target.value
-                      )
+                  <strong>
+                    {archivoUsuarios.name}
+                  </strong>
 
-                      setClientesVipImportados(
-                        false
-                      )
-
-                      setArchivoClientesVip(
-                        null
-                      )
-
-                    }}
-                  />
-
-                  Sí
-
-                </label>
-
-
-                <label>
-
-                  <input
-                    type="radio"
-                    name="clientesVip"
-                    value="no"
-                    checked={
-                      tieneClientesVip === "no"
-                    }
-                    onChange={(e) => {
-
-                      setTieneClientesVip(
-                        e.target.value
-                      )
-
-                      // Si selecciona NO,
-                      // ya no necesita Excel
-                      setArchivoClientesVip(
-                        null
-                      )
-
-                      setClientesVipImportados(
-                        false
-                      )
-
-                    }}
-                  />
-
-                  No
-
-                </label>
-
-              </div>
-
-
-              {/* ================================= */}
-              {/* IMPORTACIÓN VIP */}
-              {/* ================================= */}
-
-              {tieneClientesVip === "si" && (
-
-                <div className="clientes-vip-importacion">
-
-                  <p className="campo-ayuda">
-
-                    Importe un archivo Excel con
-                    los clientes VIP.
-
-                    <br />
-
-                    El archivo debe contener:
-
-                    <strong>
-                      {" "}RUC y razón social.
-                    </strong>
-
-                  </p>
-
-
-                  <label className="boton-archivo">
-
-                    📎 Importar Excel
-
-                    <input
-                      type="file"
-                      accept=".xlsx,.xls"
-                      onChange={(e) => {
-
-                        setArchivoClientesVip(
-                          e.target.files[0]
-                        )
-
-                        // Al seleccionar un
-                        // nuevo archivo todavía
-                        // no está importado
-                        setClientesVipImportados(
-                          false
-                        )
-
-                      }}
-                      hidden
-                    />
-
-                  </label>
-
-
-                  {archivoClientesVip && (
-
-                    <p className="archivo-seleccionado">
-
-                      Archivo seleccionado:
-
-                      {" "}
-
-                      {archivoClientesVip.name}
-
-                    </p>
-
-                  )}
-
-
-                  {clientesVipImportados && (
-
-                    <p className="archivo-importado">
-
-                      ✓ Clientes VIP importados
-                      correctamente.
-
-                    </p>
-
-                  )}
-
-
-                  <button
-                    type="button"
-                    onClick={importarClientesVip}
-                    disabled={!archivoClientesVip}
-                  >
-                    Importar clientes VIP
-                  </button>
-
-                </div>
+                </p>
 
               )}
 
             </div>
 
 
-            {/* ================================= */}
-            {/* PÉRDIDA VIP MÍNIMA */}
-            {/* ================================= */}
+            {/* BOTÓN VISUALIZAR USUARIOS */}
+
+            {usuariosExcel.length > 0 && (
+
+              <div className="asistente-campo">
+
+                <button
+                  type="button"
+                  className="boton-secundario"
+                  onClick={() =>
+                    setMostrarUsuariosExcel(
+                      !mostrarUsuariosExcel
+                    )
+                  }
+                >
+
+                  {mostrarUsuariosExcel
+                    ? "Ocultar datos"
+                    : "Visualizar datos"}
+
+                </button>
+
+              </div>
+
+            )}
+
+
+            {/* TABLA USUARIOS */}
+
+            {mostrarUsuariosExcel &&
+              usuariosExcel.length > 0 && (
+
+                <div className="clientes-tabla-container">
+
+                  <table className="clientes-tabla">
+
+                    <thead>
+
+                      <tr>
+
+                        <th>
+                          Nombre
+                        </th>
+
+                        <th>
+                          Correo
+                        </th>
+
+                        <th>
+                          Área
+                        </th>
+
+                      </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                      {usuariosExcel.map(
+                        (usuario, indice) => {
+
+                          const nombre =
+                            usuario.nombre ??
+                            usuario.Nombre ??
+                            "-"
+
+                          const correo =
+                            usuario.correo ??
+                            usuario.Correo ??
+                            "-"
+
+                          const area =
+                            usuario.area ??
+                            usuario.Area ??
+                            "-"
+
+
+                          return (
+
+                            <tr key={indice}>
+
+                              <td>
+                                {nombre}
+                              </td>
+
+                              <td>
+                                {correo}
+                              </td>
+
+                              <td>
+                                {area}
+                              </td>
+
+                            </tr>
+
+                          )
+
+                        }
+                      )}
+
+                    </tbody>
+
+                  </table>
+
+                </div>
+
+              )}
+
+
+            {/* ==================================
+                CONTEXTO OPERATIVO
+            =================================== */}
+
+            <h3>
+              Contexto operativo
+            </h3>
+
 
             <div className="asistente-campo">
 
               <label>
-                Pérdida potencial mínima
-                — cliente o área VIP *
+                ¿Qué tipo de documentos
+                recibe diariamente? *
+              </label>
+
+
+              <select
+                value={
+                  documentosRecibidosDiariamente
+                }
+                onChange={(e) =>
+                  setDocumentosRecibidosDiariamente(
+                    e.target.value
+                  )
+                }
+              >
+
+                <option value="">
+                  Seleccione un tipo de documento
+                </option>
+
+                <option value="Facturas">
+                  Facturas
+                </option>
+
+                <option value="Órdenes de compra">
+                  Órdenes de compra
+                </option>
+
+                <option value="Contratos">
+                  Contratos
+                </option>
+
+                <option value="Estados de cuenta">
+                  Estados de cuenta
+                </option>
+
+                <option value="Comprobantes de pago">
+                  Comprobantes de pago
+                </option>
+
+                <option value="Documentos de clientes">
+                  Documentos de clientes
+                </option>
+
+                <option value="Documentos de deudores">
+                  Documentos de deudores
+                </option>
+
+                <option value="Otros documentos financieros">
+                  Otros documentos financieros
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div className="asistente-campo">
+
+              <label>
+                Promedio de operaciones diarias *
               </label>
 
               <input
                 type="number"
-                min="0"
+                value={
+                  promedioOperacionesDiarias
+                }
+                onChange={(e) =>
+                  setPromedioOperacionesDiarias(
+                    e.target.value
+                  )
+                }
+                placeholder="Ej. 100"
+              />
+
+            </div>
+
+
+            {/* ==================================
+                CONTEXTO FACTORING
+            =================================== */}
+
+            <h3>
+              Contexto factoring
+            </h3>
+
+
+            <div className="configuracion-tabs">
+
+              <button
+                className={
+                  vistaFactoring === "clientes"
+                    ? "tab-activa"
+                    : ""
+                }
+                onClick={() =>
+                  setVistaFactoring(
+                    "clientes"
+                  )
+                }
+              >
+                Clientes
+              </button>
+
+
+              <button
+                className={
+                  vistaFactoring === "deudores"
+                    ? "tab-activa"
+                    : ""
+                }
+                onClick={() =>
+                  setVistaFactoring(
+                    "deudores"
+                  )
+                }
+              >
+                Deudores
+              </button>
+
+            </div>
+
+
+            {/* ==================================
+                CLIENTES
+            =================================== */}
+
+            {vistaFactoring === "clientes" && (
+
+              <div className="asistente-campo">
+
+                <label>
+                  Clientes
+                </label>
+
+
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  id="excel-clientes"
+                  onChange={(e) =>
+                    seleccionarExcelClientes(
+                      e.target.files[0]
+                    )
+                  }
+                  hidden
+                />
+
+
+                <label
+                  htmlFor="excel-clientes"
+                  className="boton-secundario"
+                >
+                  Seleccionar Excel
+                </label>
+
+
+                {archivoClientes && (
+
+                  <p>
+
+                    Archivo seleccionado:{" "}
+
+                    <strong>
+                      {archivoClientes.name}
+                    </strong>
+
+                  </p>
+
+                )}
+
+
+                {clientesExcel.length > 0 && (
+
+                  <button
+                    type="button"
+                    className="boton-secundario"
+                    onClick={() =>
+                      setMostrarClientes(
+                        !mostrarClientes
+                      )
+                    }
+                  >
+
+                    {mostrarClientes
+                      ? "Ocultar datos"
+                      : "Visualizar datos"}
+
+                  </button>
+
+                )}
+
+
+                {mostrarClientes &&
+                  clientesExcel.length > 0 && (
+
+                    <div className="clientes-tabla-container">
+
+                      <table className="clientes-tabla">
+
+                        <thead>
+
+                          <tr>
+
+                            {Object.keys(
+                              clientesExcel[0]
+                            ).map(
+                              (columna) => (
+
+                                <th
+                                  key={columna}
+                                >
+                                  {columna}
+                                </th>
+
+                              )
+                            )}
+
+                          </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                          {clientesExcel.map(
+                            (cliente, indice) => (
+
+                              <tr
+                                key={indice}
+                              >
+
+                                {Object.values(
+                                  cliente
+                                ).map(
+                                  (
+                                    valor,
+                                    index
+                                  ) => (
+
+                                    <td
+                                      key={index}
+                                    >
+                                      {String(
+                                        valor ??
+                                          ""
+                                      )}
+                                    </td>
+
+                                  )
+                                )}
+
+                              </tr>
+
+                            )
+                          )}
+
+                        </tbody>
+
+                      </table>
+
+                    </div>
+
+                  )}
+
+              </div>
+
+            )}
+
+
+            {/* ==================================
+                DEUDORES
+            =================================== */}
+
+            {vistaFactoring === "deudores" && (
+
+              <div className="asistente-campo">
+
+                <label>
+                  Deudores
+                </label>
+
+
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  id="excel-deudores"
+                  onChange={(e) =>
+                    seleccionarExcelDeudores(
+                      e.target.files[0]
+                    )
+                  }
+                  hidden
+                />
+
+
+                <label
+                  htmlFor="excel-deudores"
+                  className="boton-secundario"
+                >
+                  Seleccionar Excel
+                </label>
+
+
+                {archivoDeudores && (
+
+                  <p>
+
+                    Archivo seleccionado:{" "}
+
+                    <strong>
+                      {archivoDeudores.name}
+                    </strong>
+
+                  </p>
+
+                )}
+
+
+                {deudoresExcel.length > 0 && (
+
+                  <button
+                    type="button"
+                    className="boton-secundario"
+                    onClick={() =>
+                      setMostrarDeudores(
+                        !mostrarDeudores
+                      )
+                    }
+                  >
+
+                    {mostrarDeudores
+                      ? "Ocultar datos"
+                      : "Visualizar datos"}
+
+                  </button>
+
+                )}
+
+
+                {mostrarDeudores &&
+                  deudoresExcel.length > 0 && (
+
+                    <div className="clientes-tabla-container">
+
+                      <table className="clientes-tabla">
+
+                        <thead>
+
+                          <tr>
+
+                            {Object.keys(
+                              deudoresExcel[0]
+                            ).map(
+                              (columna) => (
+
+                                <th
+                                  key={columna}
+                                >
+                                  {columna}
+                                </th>
+
+                              )
+                            )}
+
+                          </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                          {deudoresExcel.map(
+                            (deudor, indice) => (
+
+                              <tr
+                                key={indice}
+                              >
+
+                                {Object.values(
+                                  deudor
+                                ).map(
+                                  (
+                                    valor,
+                                    index
+                                  ) => (
+
+                                    <td
+                                      key={index}
+                                    >
+                                      {String(
+                                        valor ??
+                                          ""
+                                      )}
+                                    </td>
+
+                                  )
+                                )}
+
+                              </tr>
+
+                            )
+                          )}
+
+                        </tbody>
+
+                      </table>
+
+                    </div>
+
+                  )}
+
+              </div>
+
+            )}
+
+
+            {/* ==================================
+                PERFIL DE RIESGO
+            =================================== */}
+
+            <h3>
+              Perfil de riesgo
+            </h3>
+
+
+            <div className="asistente-campo">
+
+              <label>
+                Pérdida potencial mínima —
+                cliente o área VIP *
+              </label>
+
+              <input
+                type="number"
                 value={perdidaVipMin}
                 onChange={(e) =>
                   setPerdidaVipMin(
                     e.target.value
                   )
                 }
-                placeholder="Ejemplo: 50000"
+                placeholder="Ej. 10000"
               />
 
             </div>
 
 
-            {/* ================================= */}
-            {/* PÉRDIDA VIP MÁXIMA */}
-            {/* ================================= */}
-
             <div className="asistente-campo">
 
               <label>
-                Pérdida potencial máxima
-                — cliente o área VIP *
+                Pérdida potencial máxima —
+                cliente o área VIP *
               </label>
 
               <input
                 type="number"
-                min="0"
                 value={perdidaVipMax}
                 onChange={(e) =>
                   setPerdidaVipMax(
                     e.target.value
                   )
                 }
-                placeholder="Ejemplo: 500000"
+                placeholder="Ej. 100000"
               />
 
             </div>
 
 
-            {/* ================================= */}
-            {/* PÉRDIDA NO VIP MÍNIMA */}
-            {/* ================================= */}
-
             <div className="asistente-campo">
 
               <label>
-                Pérdida potencial mínima
-                — cliente o área no VIP *
+                Pérdida potencial mínima —
+                cliente o área no VIP *
               </label>
 
               <input
                 type="number"
-                min="0"
                 value={perdidaNoVipMin}
                 onChange={(e) =>
                   setPerdidaNoVipMin(
                     e.target.value
                   )
                 }
-                placeholder="Ejemplo: 10000"
+                placeholder="Ej. 1000"
               />
 
             </div>
 
 
-            {/* ================================= */}
-            {/* PÉRDIDA NO VIP MÁXIMA */}
-            {/* ================================= */}
-
             <div className="asistente-campo">
 
               <label>
-                Pérdida potencial máxima
-                — cliente o área no VIP *
+                Pérdida potencial máxima —
+                cliente o área no VIP *
               </label>
 
               <input
                 type="number"
-                min="0"
                 value={perdidaNoVipMax}
                 onChange={(e) =>
                   setPerdidaNoVipMax(
                     e.target.value
                   )
                 }
-                placeholder="Ejemplo: 100000"
+                placeholder="Ej. 10000"
               />
 
             </div>
 
 
-            {/* ================================= */}
-            {/* SITUACIONES RIESGOSAS */}
-            {/* ================================= */}
+            {/* ==================================
+                SITUACIONES RIESGOSAS
+            =================================== */}
 
             <div className="asistente-campo">
 
@@ -1478,42 +1563,77 @@ function Configuracion() {
                 riesgosas? *
               </label>
 
-              <textarea
+
+              <select
                 value={situacionesRiesgosas}
                 onChange={(e) =>
                   setSituacionesRiesgosas(
                     e.target.value
                   )
                 }
-                placeholder="Ejemplo: cambio de cuenta bancaria, modificación de datos de pago, solicitud urgente de transferencia, cambio de beneficiario"
-              />
+              >
+
+                <option value="">
+                  Seleccione una situación
+                </option>
+
+                <option value="Cambio de cuenta bancaria">
+                  Cambio de cuenta bancaria
+                </option>
+
+                <option value="Cambio de beneficiario">
+                  Cambio de beneficiario
+                </option>
+
+                <option value="Modificación de datos de pago">
+                  Modificación de datos de pago
+                </option>
+
+                <option value="Solicitud urgente de transferencia">
+                  Solicitud urgente de transferencia
+                </option>
+
+                <option value="Solicitud de información confidencial">
+                  Solicitud de información confidencial
+                </option>
+
+                <option value="Envío de documentos sensibles">
+                  Envío de documentos sensibles
+                </option>
+
+                <option value="Solicitud de desembolso">
+                  Solicitud de desembolso
+                </option>
+
+              </select>
+
+            </div>
+
+
+            {/* ==================================
+                GUARDAR
+            =================================== */}
+
+            <div className="asistente-campo">
+
+              <button
+                type="button"
+                onClick={
+                  guardarConfiguracion
+                }
+              >
+                Guardar configuración
+              </button>
 
             </div>
 
           </div>
 
+        )}
 
-          {/* ===================================== */}
-          {/* GUARDAR CONFIGURACIÓN */}
-          {/* ===================================== */}
-
-          <div className="guardar-configuracion">
-
-            <button
-              type="button"
-              onClick={guardarConfiguracion}
-            >
-              Guardar configuración
-            </button>
-
-          </div>
-
-        </div>
-
-      )}
+      </div>
 
     </div>
-
   )
 }
 
