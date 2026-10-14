@@ -4,7 +4,7 @@ import Eventos from './Eventos'
 import { useState } from 'react'
 import Configuracion from './Configuracion'
 
-function Dashboard({ usuario, cerrarSesion }) {
+function Dashboard({ usuario, cerrarSesion, esAdministrador }) {
 
   const [pagina, setPagina] = useState("panel")
   return (
@@ -70,6 +70,10 @@ function Dashboard({ usuario, cerrarSesion }) {
             {usuario.correo}
           </p>
 
+          <p className="usuario-correo">
+            {esAdministrador ? "Administrador" : "Usuario"}
+          </p>
+
           <button
             className="cerrar-sesion"
             onClick={cerrarSesion}
@@ -122,7 +126,7 @@ function Dashboard({ usuario, cerrarSesion }) {
   )}
 
   {pagina === "configuracion" && (
-    <Configuracion />
+    <Configuracion esAdministrador={esAdministrador} />
   )}
 
 </main>

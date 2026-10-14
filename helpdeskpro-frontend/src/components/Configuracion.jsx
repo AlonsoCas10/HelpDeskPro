@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import '../App.css'
-import axios from 'axios'
+import apiClient from '../api/apiClient'
 import * as XLSX from 'xlsx'
 
-function Configuracion() {
+function Configuracion({ esAdministrador = false }) {
 
-  const [seccion, setSeccion] = useState("")
+  const [seccion, setSeccion] = useState("asistente")
   const [vistaFactoring, setVistaFactoring] = useState("")
 
   // ==========================================
@@ -338,8 +338,8 @@ function Configuracion() {
       // 1. GUARDAR CONFIGURACIÓN GENERAL
       // ==========================================
 
-      const respuestaConfiguracion = await axios.post(
-        "http://localhost:8080/configuracion",
+      const respuesta = await apiClient.post(
+        "/facturas",
         {
 
           nombreEmpresa,
@@ -548,33 +548,35 @@ function Configuracion() {
 
       <div className="configuracion-tabs">
 
-        <button
-          className={
-            seccion === "integraciones"
-              ? "tab-activa"
-              : ""
-          }
-          onClick={() =>
-            setSeccion("integraciones")
-          }
-        >
-          Integraciones
-        </button>
+        {esAdministrador && (
+          <>
+            <button
+              className={
+                seccion === "integraciones"
+                  ? "tab-activa"
+                  : ""
+              }
+              onClick={() =>
+                setSeccion("integraciones")
+              }
+            >
+              Integraciones
+            </button>
 
-
-        <button
-          className={
-            seccion === "usuarios"
-              ? "tab-activa"
-              : ""
-          }
-          onClick={() =>
-            setSeccion("usuarios")
-          }
-        >
-          Usuarios y Roles
-        </button>
-
+            <button
+              className={
+                seccion === "usuarios"
+                  ? "tab-activa"
+                  : ""
+              }
+              onClick={() =>
+                setSeccion("usuarios")
+              }
+            >
+              Usuarios y Roles
+            </button>
+          </>
+        )}
 
         <button
           className={
@@ -603,7 +605,7 @@ function Configuracion() {
             INTEGRACIONES
         ===================================== */}
 
-        {seccion === "integraciones" && (
+      {esAdministrador && seccion === "integraciones" && (
 
           <div className="asistente-datos">
 
@@ -655,7 +657,7 @@ function Configuracion() {
             USUARIOS Y ROLES
         ===================================== */}
 
-        {seccion === "usuarios" && (
+      {esAdministrador && seccion === "usuarios" && (
 
           <div className="asistente-datos">
 
