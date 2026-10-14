@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { useAuth } from 'react-oidc-context'
 import './App.css'
+import { setAccessToken } from './api/apiClient'
 import Dashboard from './components/Dashboard'
 import Logo from './components/Logo'
 
@@ -9,7 +11,14 @@ const cognitoDomain = import.meta.env.VITE_COGNITO_DOMAIN
 
 function App() {
   const auth = useAuth()
+
+  useEffect(() => {
+    setAccessToken(auth.isAuthenticated ? auth.user?.access_token : null)
+  }, [auth.isAuthenticated, auth.user?.access_token])
+
   const profile = auth.user?.profile ?? {}
+  const grupos = profile['cognito:groups'] ?? []
+  const esAdministrador = Array.isArray(grupos) && grupos.includes('Administrador')
   const usuario = {
     nombre: profile.name ?? profile.preferred_username ?? profile.email ?? profile.sub ?? 'Usuario',
     correo: profile.email ?? profile.preferred_username ?? 'Correo no disponible',
@@ -33,7 +42,13 @@ function App() {
   }
 
   if (auth.isAuthenticated) {
-    return <Dashboard usuario={usuario} cerrarSesion={cerrarSesion} />
+    return (
+      <Dashboard
+        usuario={usuario}
+        cerrarSesion={cerrarSesion}
+        esAdministrador={esAdministrador}
+      />
+    )
   }
 
   return (

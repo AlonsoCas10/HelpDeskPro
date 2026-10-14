@@ -1,11 +1,11 @@
 
 import { useState } from 'react'
 import '../App.css'
-import axios from 'axios'
+import apiClient from '../api/apiClient'
 
-function Configuracion() {
+function Configuracion({ esAdministrador = false }) {
 
-  const [seccion, setSeccion] = useState("")
+  const [seccion, setSeccion] = useState("asistente")
   const [vistaFactoring, setVistaFactoring] = useState("")
 
   // ================================
@@ -151,8 +151,8 @@ function Configuracion() {
 
     try {
 
-      const respuesta = await axios.post(
-        "http://localhost:8080/configuracion",
+      const respuesta = await apiClient.post(
+        "/configuracion",
         {
           nombreEmpresa: nombreEmpresa,
           moneda: moneda,
@@ -224,8 +224,8 @@ function Configuracion() {
 
     try {
 
-      const respuesta = await axios.post(
-        "http://localhost:8080/clientes",
+      const respuesta = await apiClient.post(
+        "/clientes",
         {
           razonSocial: razonSocialCliente,
           ruc: rucCliente,
@@ -272,8 +272,8 @@ function Configuracion() {
 
     try {
 
-      const respuesta = await axios.post(
-        "http://localhost:8080/deudores",
+      const respuesta = await apiClient.post(
+        "/deudores",
         {
           razonSocial: razonSocialDeudor,
           ruc: rucDeudor
@@ -322,8 +322,8 @@ function Configuracion() {
 
     try {
 
-      const respuesta = await axios.post(
-        "http://localhost:8080/facturas",
+      const respuesta = await apiClient.post(
+        "/facturas",
         {
           numeroFactura: numeroFactura,
           rucCliente: rucClienteFactura,
@@ -380,8 +380,8 @@ function Configuracion() {
 
     try {
 
-      const respuesta = await axios.post(
-        "http://localhost:8080/clientes/importar-vip",
+      const respuesta = await apiClient.post(
+        "/clientes/importar-vip",
         datos,
         {
           headers: {
@@ -450,31 +450,35 @@ function Configuracion() {
 
       <div className="configuracion-tabs">
 
-        <button
-          className={
-            seccion === "integraciones"
-              ? "tab-activa"
-              : ""
-          }
-          onClick={() =>
-            setSeccion("integraciones")
-          }
-        >
-          Integraciones
-        </button>
+        {esAdministrador && (
+          <>
+            <button
+              className={
+                seccion === "integraciones"
+                  ? "tab-activa"
+                  : ""
+              }
+              onClick={() =>
+                setSeccion("integraciones")
+              }
+            >
+              Integraciones
+            </button>
 
-        <button
-          className={
-            seccion === "usuarios"
-              ? "tab-activa"
-              : ""
-          }
-          onClick={() =>
-            setSeccion("usuarios")
-          }
-        >
-          Usuarios y Roles
-        </button>
+            <button
+              className={
+                seccion === "usuarios"
+                  ? "tab-activa"
+                  : ""
+              }
+              onClick={() =>
+                setSeccion("usuarios")
+              }
+            >
+              Usuarios y Roles
+            </button>
+          </>
+        )}
 
         <button
           className={
@@ -496,7 +500,7 @@ function Configuracion() {
       {/* INTEGRACIONES */}
       {/* ===================================== */}
 
-      {seccion === "integraciones" && (
+      {esAdministrador && seccion === "integraciones" && (
 
         <div className="configuracion-card">
 
@@ -540,7 +544,7 @@ function Configuracion() {
       {/* USUARIOS Y ROLES */}
       {/* ===================================== */}
 
-      {seccion === "usuarios" && (
+      {esAdministrador && seccion === "usuarios" && (
 
         <div className="configuracion-card">
 

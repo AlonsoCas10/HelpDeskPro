@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import '../App.css'
+import apiClient from '../api/apiClient'
 
 function Eventos() {
 
@@ -38,7 +38,7 @@ function Eventos() {
   useEffect(() => {
     let componenteActivo = true
 
-    axios.get("http://localhost:8080/eventos")
+    apiClient.get("/eventos")
       .then((respuesta) => {
         if (componenteActivo) {
           setEventos(respuesta.data)
@@ -78,8 +78,8 @@ function Eventos() {
       }
 
 
-      const respuesta = await axios.post(
-        "http://localhost:8080/eventos",
+      const respuesta = await apiClient.post(
+        "/eventos",
         nuevoEvento
       )
 

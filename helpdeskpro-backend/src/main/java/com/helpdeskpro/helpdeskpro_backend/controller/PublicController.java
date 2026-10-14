@@ -1,7 +1,5 @@
 package com.helpdeskpro.helpdeskpro_backend.controller;
 
-import java.net.ResponseCache;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
