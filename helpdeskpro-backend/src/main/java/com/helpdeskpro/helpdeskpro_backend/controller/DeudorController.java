@@ -1,7 +1,7 @@
 package com.helpdeskpro.helpdeskpro_backend.controller;
 
-import com.helpdeskpro.helpdeskpro_backend.model.DeudorSimulado;
-import com.helpdeskpro.helpdeskpro_backend.service.DeudorSimuladoService;
+import com.helpdeskpro.helpdeskpro_backend.model.Deudor;
+import com.helpdeskpro.helpdeskpro_backend.service.DeudorService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,21 +9,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/deudores")
 @CrossOrigin(origins = "http://localhost:5173")
-public class DeudorSimuladoController {
+public class DeudorController {
 
-    private final DeudorSimuladoService service;
+    private final DeudorService service;
 
-    public DeudorSimuladoController(DeudorSimuladoService service) {
+    public DeudorController(DeudorService service) {
         this.service = service;
     }
 
     @GetMapping
-    public List<DeudorSimulado> listar() {
+    public List<Deudor> listar() {
         return service.listar();
     }
 
     @PostMapping
-    public DeudorSimulado guardar(@RequestBody DeudorSimulado deudor) {
+    public Deudor guardar(@RequestBody Deudor deudor) {
         return service.guardar(deudor);
     }
 

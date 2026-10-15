@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import '../App.css'
+import apiClient from '../api/apiClient'
 
 function Eventos() {
 
@@ -36,29 +36,22 @@ function Eventos() {
   // =====================================================
 
   useEffect(() => {
+    let componenteActivo = true
 
-    obtenerEventos()
+    apiClient.get("/eventos")
+      .then((respuesta) => {
+        if (componenteActivo) {
+          setEventos(respuesta.data)
+        }
+      })
+      .catch((error) => {
+        console.error("Error al obtener eventos:", error)
+      })
 
-  }, [])
-
-
-  async function obtenerEventos() {
-
-    try {
-
-      const respuesta = await axios.get(
-        "http://localhost:8080/eventos"
-      )
-
-      setEventos(respuesta.data)
-
-    } catch (error) {
-
-      console.error("Error al obtener eventos:", error)
-
+    return () => {
+      componenteActivo = false
     }
-
-  }
+  }, [])
 
 
   // =====================================================
@@ -85,8 +78,8 @@ function Eventos() {
       }
 
 
-      const respuesta = await axios.post(
-        "http://localhost:8080/eventos",
+      const respuesta = await apiClient.post(
+        "/eventos",
         nuevoEvento
       )
 

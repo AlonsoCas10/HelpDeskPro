@@ -1,13 +1,12 @@
 package com.helpdeskpro.helpdeskpro_backend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Table(name = "configuracion_empresa")
 public class ConfiguracionEmpresa {
 
     @Id
@@ -20,24 +19,41 @@ public class ConfiguracionEmpresa {
 
     private Integer cantidadColaboradores;
     private String areasCriticas;
-    private String usuariosAreasCriticas;
-    private String informacionCritica;
 
     private String documentosRecibidosDiariamente;
     private Integer promedioOperacionesDiarias;
 
-    private String clientesVip;
-
-    private BigDecimal perdidaVipMin;
-    private BigDecimal perdidaVipMax;
-
-    private BigDecimal perdidaNoVipMin;
-    private BigDecimal perdidaNoVipMax;
-
     private String situacionesRiesgosas;
+
+    // ==========================================
+    // RANGOS DE PÉRDIDA POTENCIAL
+    // ==========================================
+
+    private BigDecimal perdidaMinNoVip;
+    private BigDecimal perdidaMaxNoVip;
+
+    private BigDecimal perdidaMinVip;
+    private BigDecimal perdidaMaxVip;
+
+    // ==========================================
+    // RELACIONES
+    // ==========================================
+
+    @OneToMany(mappedBy = "configuracionEmpresa")
+    private List<Cliente> clientes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "configuracionEmpresa")
+    private List<Deudor> deudores = new ArrayList<>();
+
+    @OneToMany(mappedBy = "configuracionEmpresa")
+    private List<UsuarioCritico> usuariosCriticos = new ArrayList<>();
 
     public ConfiguracionEmpresa() {
     }
+
+    // ==========================================
+    // GETTERS Y SETTERS
+    // ==========================================
 
     public Long getId() {
         return id;
@@ -87,22 +103,6 @@ public class ConfiguracionEmpresa {
         this.areasCriticas = areasCriticas;
     }
 
-    public String getUsuariosAreasCriticas() {
-        return usuariosAreasCriticas;
-    }
-
-    public void setUsuariosAreasCriticas(String usuariosAreasCriticas) {
-        this.usuariosAreasCriticas = usuariosAreasCriticas;
-    }
-
-    public String getInformacionCritica() {
-        return informacionCritica;
-    }
-
-    public void setInformacionCritica(String informacionCritica) {
-        this.informacionCritica = informacionCritica;
-    }
-
     public String getDocumentosRecibidosDiariamente() {
         return documentosRecibidosDiariamente;
     }
@@ -119,51 +119,75 @@ public class ConfiguracionEmpresa {
         this.promedioOperacionesDiarias = promedioOperacionesDiarias;
     }
 
-    public String getClientesVip() {
-        return clientesVip;
-    }
-
-    public void setClientesVip(String clientesVip) {
-        this.clientesVip = clientesVip;
-    }
-
-    public BigDecimal getPerdidaVipMin() {
-        return perdidaVipMin;
-    }
-
-    public void setPerdidaVipMin(BigDecimal perdidaVipMin) {
-        this.perdidaVipMin = perdidaVipMin;
-    }
-
-    public BigDecimal getPerdidaVipMax() {
-        return perdidaVipMax;
-    }
-
-    public void setPerdidaVipMax(BigDecimal perdidaVipMax) {
-        this.perdidaVipMax = perdidaVipMax;
-    }
-
-    public BigDecimal getPerdidaNoVipMin() {
-        return perdidaNoVipMin;
-    }
-
-    public void setPerdidaNoVipMin(BigDecimal perdidaNoVipMin) {
-        this.perdidaNoVipMin = perdidaNoVipMin;
-    }
-
-    public BigDecimal getPerdidaNoVipMax() {
-        return perdidaNoVipMax;
-    }
-
-    public void setPerdidaNoVipMax(BigDecimal perdidaNoVipMax) {
-        this.perdidaNoVipMax = perdidaNoVipMax;
-    }
-
     public String getSituacionesRiesgosas() {
         return situacionesRiesgosas;
     }
 
     public void setSituacionesRiesgosas(String situacionesRiesgosas) {
         this.situacionesRiesgosas = situacionesRiesgosas;
+    }
+
+    // ==========================================
+    // GETTERS Y SETTERS DE PÉRDIDAS
+    // ==========================================
+
+    public BigDecimal getPerdidaMinNoVip() {
+        return perdidaMinNoVip;
+    }
+
+    public void setPerdidaMinNoVip(BigDecimal perdidaMinNoVip) {
+        this.perdidaMinNoVip = perdidaMinNoVip;
+    }
+
+    public BigDecimal getPerdidaMaxNoVip() {
+        return perdidaMaxNoVip;
+    }
+
+    public void setPerdidaMaxNoVip(BigDecimal perdidaMaxNoVip) {
+        this.perdidaMaxNoVip = perdidaMaxNoVip;
+    }
+
+    public BigDecimal getPerdidaMinVip() {
+        return perdidaMinVip;
+    }
+
+    public void setPerdidaMinVip(BigDecimal perdidaMinVip) {
+        this.perdidaMinVip = perdidaMinVip;
+    }
+
+    public BigDecimal getPerdidaMaxVip() {
+        return perdidaMaxVip;
+    }
+
+    public void setPerdidaMaxVip(BigDecimal perdidaMaxVip) {
+        this.perdidaMaxVip = perdidaMaxVip;
+    }
+
+    // ==========================================
+    // GETTERS Y SETTERS DE RELACIONES
+    // ==========================================
+
+    public List<Cliente> getClientes() {
+        return clientes;
+    }
+
+    public void setClientes(List<Cliente> clientes) {
+        this.clientes = clientes;
+    }
+
+    public List<Deudor> getDeudores() {
+        return deudores;
+    }
+
+    public void setDeudores(List<Deudor> deudores) {
+        this.deudores = deudores;
+    }
+
+    public List<UsuarioCritico> getUsuariosCriticos() {
+        return usuariosCriticos;
+    }
+
+    public void setUsuariosCriticos(List<UsuarioCritico> usuariosCriticos) {
+        this.usuariosCriticos = usuariosCriticos;
     }
 }

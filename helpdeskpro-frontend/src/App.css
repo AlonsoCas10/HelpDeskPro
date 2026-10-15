@@ -1779,3 +1779,714 @@ margin-top: 25px;
 
   accent-color: #000000;
 }
+
+
+/* =========================================================
+   CLIENTES
+   ========================================================= */
+
+.clientes-panel {
+  width: 100%;
+  margin-top: 30px;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+   ========================================================= */
+
+.clientes-header {
+  margin-bottom: 24px;
+}
+
+.clientes-header h3 {
+  margin: 0 0 7px 0;
+  color: #111827;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.clientes-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   IMPORTACIÓN
+   ========================================================= */
+
+.clientes-importacion {
+  width: 100%;
+  padding: 30px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  text-align: center;
+
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+
+/* ICONO */
+
+.clientes-importacion-icono {
+  width: 58px;
+  height: 58px;
+
+  margin: 0 auto 16px auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+
+  background: #f9fafb;
+
+  font-size: 25px;
+}
+
+
+/* TÍTULO */
+
+.clientes-importacion h3 {
+  margin: 0 0 8px 0;
+
+  color: #111827;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+
+/* DESCRIPCIÓN */
+
+.clientes-importacion p {
+  max-width: 600px;
+
+  margin: 0 auto 20px auto;
+
+  color: #6b7280;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   BOTÓN SELECCIONAR EXCEL
+   ========================================================= */
+
+.boton-seleccionar-excel {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 11px 18px;
+
+  border: 1px solid #111827;
+  border-radius: 8px;
+
+  background: #111827;
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.boton-seleccionar-excel:hover {
+  background: #1f2937;
+
+  transform: translateY(-1px);
+}
+
+
+/* TEXTO FORMATO */
+
+.formato-excel {
+  display: block;
+
+  margin-top: 10px;
+
+  color: #9ca3af;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   ARCHIVO SELECCIONADO
+   ========================================================= */
+
+.archivo-seleccionado {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-top: 16px;
+
+  padding: 15px 18px;
+
+  background: #f9fafb;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 8px;
+
+  font-size: 13px;
+}
+
+.archivo-seleccionado strong {
+  color: #111827;
+}
+
+.archivo-seleccionado span {
+  color: #16a34a;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
+.clientes-acciones {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 18px;
+}
+
+.clientes-acciones button {
+  padding: 10px 17px;
+
+  border-radius: 8px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+/* IMPORTAR */
+
+.boton-importar-clientes {
+  border: 1px solid #111827;
+
+  background: #111827;
+
+  color: #ffffff;
+}
+
+.boton-importar-clientes:hover:not(:disabled) {
+  background: #1f2937;
+
+  transform: translateY(-1px);
+}
+
+
+/* DESHABILITADO */
+
+.boton-importar-clientes:disabled {
+  background: #e5e7eb;
+
+  border-color: #e5e7eb;
+
+  color: #9ca3af;
+
+  cursor: not-allowed;
+}
+
+
+/* VER CLIENTES */
+
+.boton-ver-clientes {
+  border: 1px solid #d1d5db;
+
+  background: #ffffff;
+
+  color: #111827;
+}
+
+.boton-ver-clientes:hover {
+  background: #f3f4f6;
+
+  border-color: #9ca3af;
+}
+
+
+/* =========================================================
+   MENSAJE DE IMPORTACIÓN
+   ========================================================= */
+
+.mensaje-importacion-exitosa {
+  margin-top: 16px;
+
+  padding: 13px 16px;
+
+  background: #f0fdf4;
+
+  border: 1px solid #bbf7d0;
+
+  border-radius: 8px;
+
+  color: #166534;
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   TABLA DE CLIENTES
+   ========================================================= */
+
+.clientes-tabla-container {
+  width: 100%;
+
+  margin-top: 28px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+
+  overflow: hidden;
+}
+
+
+/* CABECERA DE TABLA */
+
+.clientes-tabla-header {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 22px 24px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.clientes-tabla-header h3 {
+  margin: 0 0 6px 0;
+
+  color: #111827;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.clientes-tabla-header p {
+  margin: 0;
+
+  color: #6b7280;
+
+  font-size: 13px;
+}
+
+
+/* CONTADOR */
+
+.clientes-contador {
+  padding: 6px 11px;
+
+  background: #f3f4f6;
+
+  border-radius: 20px;
+
+  color: #374151;
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   SCROLL DE TABLA
+   ========================================================= */
+
+.tabla-scroll {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+
+/* =========================================================
+   TABLA
+   ========================================================= */
+
+.clientes-tabla {
+  width: 100%;
+
+  min-width: 1050px;
+
+  border-collapse: collapse;
+
+  font-size: 13px;
+}
+
+
+/* CABECERA */
+
+.clientes-tabla thead {
+  background: #f9fafb;
+}
+
+.clientes-tabla th {
+  padding: 13px 14px;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  color: #374151;
+
+  text-align: left;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+/* CELDAS */
+
+.clientes-tabla td {
+  padding: 14px;
+
+  border-bottom: 1px solid #f1f5f9;
+
+  color: #4b5563;
+
+  white-space: nowrap;
+}
+
+
+/* HOVER */
+
+.clientes-tabla tbody tr:hover {
+  background: #f9fafb;
+}
+
+
+/* ÚLTIMA FILA */
+
+.clientes-tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   ESTADO VIP
+   ========================================================= */
+
+.estado-vip,
+.estado-no-vip {
+  display: inline-block;
+
+  padding: 5px 9px;
+
+  border-radius: 20px;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+.estado-vip {
+  background: #fef3c7;
+
+  color: #92400e;
+}
+
+.estado-no-vip {
+  background: #f3f4f6;
+
+  color: #6b7280;
+}
+
+
+/* =========================================================
+   ESTADO DEL CLIENTE
+   ========================================================= */
+
+.estado-activo,
+.estado-inactivo {
+  display: inline-block;
+
+  padding: 5px 9px;
+
+  border-radius: 20px;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+.estado-activo {
+  background: #dcfce7;
+
+  color: #166534;
+}
+
+.estado-inactivo {
+  background: #fee2e2;
+
+  color: #991b1b;
+}
+
+
+/* =========================================================
+   TABLA VACÍA
+   ========================================================= */
+
+.tabla-vacia {
+  padding: 35px !important;
+
+  text-align: center;
+
+  color: #9ca3af !important;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   RESPONSIVE CLIENTES
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .clientes-importacion {
+    padding: 22px;
+  }
+
+  .clientes-acciones {
+    flex-direction: column;
+  }
+
+  .clientes-acciones button {
+    width: 100%;
+  }
+
+  .archivo-seleccionado {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .clientes-tabla-header {
+    align-items: flex-start;
+
+    gap: 12px;
+
+    flex-direction: column;
+  }
+
+  /* ==========================================
+   SITUACIONES DE ALTO RIESGO
+   ========================================== */
+
+.descripcion-riesgo {
+  margin-top: 6px;
+  margin-bottom: 18px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.situaciones-riesgo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.situacion-riesgo-opcion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 14px 16px;
+
+  border: 1px solid #d9dee7;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.situacion-riesgo-opcion:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.situacion-riesgo-opcion input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+
+  cursor: pointer;
+
+  accent-color: #2563eb;
+}
+
+.situacion-riesgo-texto {
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.situacion-riesgo-opcion.seleccionada {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.situacion-riesgo-opcion.seleccionada
+.situacion-riesgo-texto {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.mensaje-riesgo {
+  display: block;
+  margin-top: 12px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+
+  .situaciones-riesgo {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+/* ==========================================
+   SELECTOR MÚLTIPLE PERSONALIZADO
+   ========================================== */
+
+.selector-multiple {
+  position: relative;
+  width: 100%;
+}
+
+.selector-boton {
+  width: 100%;
+  min-height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 14px;
+
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  font-size: 14px;
+  color: #374151;
+
+  cursor: pointer;
+
+  text-align: left;
+}
+
+.selector-boton:hover {
+  border-color: #9ca3af;
+}
+
+.selector-opciones {
+  position: absolute;
+
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+
+  background: #ffffff;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+  padding: 8px 0;
+
+  z-index: 1000;
+
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.selector-opcion {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 10px 14px;
+
+  cursor: pointer;
+
+  font-size: 14px;
+  color: #374151;
+}
+
+.selector-opcion:hover {
+  background: #f3f4f6;
+}
+
+.selector-opcion input {
+  width: 16px;
+  height: 16px;
+
+  cursor: pointer;
+}
+
+}
