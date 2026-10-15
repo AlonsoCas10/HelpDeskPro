@@ -338,8 +338,8 @@ function Configuracion({ esAdministrador = false }) {
       // 1. GUARDAR CONFIGURACIÓN GENERAL
       // ==========================================
 
-      const respuesta = await apiClient.post(
-        "/facturas",
+      const respuestaConfiguracion = await apiClient.post(
+        "/configuracion",
         {
 
           nombreEmpresa,
@@ -403,8 +403,8 @@ function Configuracion({ esAdministrador = false }) {
         const usuario of usuariosParaGuardar
       ) {
 
-        await axios.post(
-          "http://localhost:8080/usuarios-criticos",
+        await apiClient.post(
+          "/usuarios-criticos",
           {
 
             nombre: usuario.nombre,
@@ -441,8 +441,8 @@ function Configuracion({ esAdministrador = false }) {
           configuracionEmpresaId
         )
 
-        await axios.post(
-          "http://localhost:8080/clientes/importar-vip",
+        await apiClient.post(
+          "/clientes/importar-vip",
           datosClientes,
           {
             headers: {
@@ -473,8 +473,8 @@ function Configuracion({ esAdministrador = false }) {
             configuracionEmpresaId
         )
 
-        await axios.post(
-          "http://localhost:8080/deudores/importar",
+        await apiClient.post(
+          "/deudores/importar",
           datosDeudores,
           {
             headers: {
