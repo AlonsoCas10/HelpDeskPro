@@ -1,0 +1,44 @@
+.
+├── README.md
+├── estructura.txt
+├── git
+├── helpdeskpro-backend
+│   ├── config
+│   │   └── WebConfig.java
+│   ├── git
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   └── src
+│       ├── main
+│       └── test
+├── helpdeskpro-db
+│   ├── docker-compose.yml
+│   ├── init
+│   │   └── init.sql.template
+│   ├── setup-db.ps1
+│   └── setup-db.sh
+├── helpdeskpro-frontend
+│   ├── README.md
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   │   ├── favicon.svg
+│   │   └── icons.svg
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── api
+│   │   ├── assets
+│   │   ├── components
+│   │   ├── index.css
+│   │   └── main.jsx
+│   └── vite.config.js
+├── mise.toml
+├── package-lock.json
+├── start-all.sh
+└── stop-all.sh
+
+14 directories, 28 files

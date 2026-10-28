@@ -31,3 +31,5 @@ target/
 *.sw?
 .DS_Store
 Thumbs.db
+# Logs y PIDs generados por start-all.sh (cambian en cada ejecución)
+logs/

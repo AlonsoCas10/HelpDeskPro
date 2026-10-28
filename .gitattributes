@@ -1,0 +1,8 @@
+# Finales de línea por tipo de archivo, sin importar la configuración de git de cada persona.
+# Sin esto, git en Windows (core.autocrlf=true) convierte los .sh a CRLF y bash falla con
+# errores como "$'\r': command not found" al correr start-all.sh desde Git Bash o WSL.
+*.sh   text eol=lf
+mvnw   text eol=lf
+# Scripts de Windows: CRLF, que es lo que esperan PowerShell y cmd.
+*.ps1  text eol=crlf
+*.cmd  text eol=crlf
