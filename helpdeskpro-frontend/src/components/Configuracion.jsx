@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import '../App.css'
 import apiClient from '../api/apiClient'
 
@@ -73,6 +73,58 @@ function Configuracion({ esAdministrador = false }) {
 
   // Indica si ya se realizó correctamente la importación
   const [clientesVipImportados, setClientesVipImportados] = useState(false)
+
+  const [gmailActivo, setGmailActivo] = useState(false)
+  const [gmailCargando, setGmailCargando] = useState(false)
+  const [gmailError, setGmailError] = useState('')
+
+  useEffect(() => {
+    if (!esAdministrador) {
+      return
+    }
+
+    let componenteActivo = true
+
+    apiClient.get('/integraciones/gmail/status')
+      .then((respuesta) => {
+        if (componenteActivo) {
+          setGmailActivo(Boolean(respuesta.data.enabled))
+        }
+      })
+      .catch(() => {
+        if (componenteActivo) {
+          setGmailError('No se pudo consultar el estado de Gmail.')
+        }
+      })
+
+    return () => {
+      componenteActivo = false
+    }
+  }, [esAdministrador])
+
+  const cambiarEstadoGmail = async (event) => {
+    const nuevoEstado = event.target.checked
+    const estadoAnterior = gmailActivo
+
+    setGmailActivo(nuevoEstado)
+    setGmailCargando(true)
+    setGmailError('')
+
+    try {
+      const respuesta = await apiClient.post(
+        `/integraciones/gmail/activation?enabled=${nuevoEstado}`
+      )
+      setGmailActivo(Boolean(respuesta.data.enabled))
+    } catch (error) {
+      setGmailActivo(estadoAnterior)
+      setGmailError(
+        error.response?.data?.message ||
+        'No se pudo actualizar la conexión de Gmail.'
+      )
+    } finally {
+      setGmailCargando(false)
+    }
+  }
 
 
   // ================================
@@ -502,39 +554,86 @@ function Configuracion({ esAdministrador = false }) {
 
       {esAdministrador && seccion === "integraciones" && (
 
-        <div className="configuracion-card">
+        <div className="integraciones-panel">
 
-          <h2>Integraciones</h2>
+          <div className="integraciones-header">
+            <div>
+              <h2>Conexiones disponibles</h2>
 
-          <p>
-            Configura las plataformas que utilizará
-            el sistema para analizar los eventos.
-          </p>
-
-          <div className="asistente-campo">
-
-            <label>
-              Microsoft 365
-            </label>
-
-            <button type="button">
-              Conectar
-            </button>
-
+              <p>
+                Activa la fuente de correo que utilizará FactSafe para recibir eventos.
+              </p>
+            </div>
           </div>
 
-          <div className="asistente-campo">
+          <div className="integraciones-grid">
+            <article className={`integracion-card ${gmailActivo ? 'integracion-card-activa' : ''}`}>
+              <div className="integracion-card-topline">
+                <span className="integracion-icono" aria-hidden="true">✉</span>
+                <label className="integracion-switch">
+                  <input
+                    type="checkbox"
+                    checked={gmailActivo}
+                    onChange={cambiarEstadoGmail}
+                    disabled={gmailCargando}
+                    aria-label="Activar Gmail"
+                  />
+                  <span className="integracion-slider" />
+                </label>
+              </div>
 
-            <label>
-              Google Workspace
-            </label>
+              <h3>Gmail</h3>
+              <p>Analiza correos entrantes de Google Workspace contra tu configuración.</p>
+              <span className={`integracion-estado ${gmailActivo ? 'integracion-estado-activa' : ''}`}>
+                {gmailCargando ? 'Actualizando...' : gmailActivo ? 'Activo' : 'Inactivo'}
+              </span>
+            </article>
 
-            <button type="button">
-              Conectar
-            </button>
+            <article className="integracion-card integracion-card-deshabilitada">
+              <div className="integracion-card-topline">
+                <span className="integracion-icono" aria-hidden="true">✉</span>
+                <span className="integracion-switch integracion-switch-disabled" aria-hidden="true">
+                  <span className="integracion-slider" />
+                </span>
+              </div>
 
+              <h3>Microsoft Outlook</h3>
+              <p>Esta integración no está disponible en el MVP.</p>
+              <span className="integracion-estado">No disponible</span>
+            </article>
+
+            <article className="integracion-card integracion-card-deshabilitada">
+              <div className="integracion-card-topline">
+                <span className="integracion-icono" aria-hidden="true">♙</span>
+                <span className="integracion-switch integracion-switch-disabled" aria-hidden="true">
+                  <span className="integracion-slider" />
+                </span>
+              </div>
+
+              <h3>WhatsApp Business</h3>
+              <p>Las alertas por WhatsApp están fuera del alcance del MVP.</p>
+              <span className="integracion-estado">No disponible</span>
+            </article>
+
+            <article className="integracion-card integracion-card-deshabilitada">
+              <div className="integracion-card-topline">
+                <span className="integracion-icono" aria-hidden="true">♙</span>
+                <span className="integracion-switch integracion-switch-disabled" aria-hidden="true">
+                  <span className="integracion-slider" />
+                </span>
+              </div>
+
+              <h3>Microsoft Teams</h3>
+              <p>Las alertas por Teams están fuera del alcance del MVP.</p>
+              <span className="integracion-estado">No disponible</span>
+            </article>
           </div>
 
+          {gmailError && (
+            <p className="integraciones-error" role="alert">
+              {gmailError}
+            </p>
+          )}
         </div>
 
       )}

@@ -1,121 +1,68 @@
-
 package com.helpdeskpro.helpdeskpro_backend.model;
-//Importamos las herramientas de JPA
+
 import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "eventos")
+@Table(name = "Evento")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Evento {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "idGmailMessage", nullable = false, length = 255)
+    private String idGmailMessage;
 
-    private String codigo;
-    private String remitente;
-    private String dominioRegistrado;
-    private Boolean remitenteConocido;
-    private String destinatario;
-    private String adjunto;
+    @Column(name = "idGmailThread", length = 255)
+    private String idGmailThread;
+
+    @Column(name = "nombreRemitente", length = 150)
+    private String nombreRemitente;
+
+    @Column(name = "correoRemitente", length = 320)
+    private String correoRemitente;
+
+    @Column(name = "dominioRemitente", length = 255)
+    private String dominioRemitente;
+
+    @Column(name = "asunto", length = 500)
     private String asunto;
-    private String clasificacion;
-    private Integer riskScore;
-    private String estado;
-    private String fechaHora;
 
-    public String getCodigo() {
-        return codigo;
-    }
+    @Column(name = "fechaHora")
+    private LocalDateTime fechaHora;
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
+    @Lob
+    @Column(name = "contenidoTexto")
+    private String contenidoTexto;
 
-    public Evento() {
-    }
+    @Lob
+    @Column(name = "contenidoHTML")
+    private String contenidoHTML;
 
-    public Long getId() {
-        return id;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estadoConexion", length = 20)
+    private EstadoConexion estadoConexion;
 
-    public String getRemitente() {
-        return remitente;
-    }
+    @Builder.Default
+    @OneToMany(
+        mappedBy = "evento",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Enlace> enlaces = new ArrayList<>();
 
-    public void setRemitente(String remitente) {
-        this.remitente = remitente;
-    }
-
-    public String getDestinatario() {
-        return destinatario;
-    }
-
-    public void setDestinatario(String destinatario) {
-        this.destinatario = destinatario;
-    }
-
-    public String getAdjunto() {
-        return adjunto;
-    }
-
-    public void setAdjunto(String adjunto) {
-        this.adjunto = adjunto;
-    }
-
-    public String getAsunto() {
-        return asunto;
-    }
-
-    public void setAsunto(String asunto) {
-        this.asunto = asunto;
-    }
-
-    public String getClasificacion() {
-        return clasificacion;
-    }
-
-    public void setClasificacion(String clasificacion) {
-        this.clasificacion = clasificacion;
-    }
-
-    public Integer getRiskScore() {
-        return riskScore;
-    }
-
-    public void setRiskScore(Integer riskScore) {
-        this.riskScore = riskScore;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
-
-    public String getFechaHora() {
-        return fechaHora;
-    }
-
-    public void setFechaHora(String fechaHora) {
-        this.fechaHora = fechaHora;
-    }
-
-    public String getDominioRegistrado() {
-        return dominioRegistrado;
-    }
-
-    public void setDominioRegistrado(String dominioRegistrado) {
-        this.dominioRegistrado = dominioRegistrado;
-    }
-
-    public Boolean getRemitenteConocido() {
-        return remitenteConocido;
-    }
-
-    public void setRemitenteConocido(Boolean remitenteConocido) {
-        this.remitenteConocido = remitenteConocido;
-    }
-
+    @Builder.Default
+    @OneToMany(
+        mappedBy = "evento",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Archivo> archivos = new ArrayList<>();
 }

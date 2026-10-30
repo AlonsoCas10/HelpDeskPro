@@ -4,6 +4,7 @@ helpdeskpro-frontend/dist/
 helpdeskpro-backend/target/
 
 .vscode/
+.github/
 .idea/
 
 *.iml
