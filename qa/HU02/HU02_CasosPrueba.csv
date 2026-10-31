@@ -1,0 +1,13 @@
+﻿id,titulo,criterio_aceptacion,correo_prueba,pasos,esperado,prioridad
+HU02-CP-A-01,Guardar una configuración válida,HU02-CA-01,ninguno,"1. Obtener token válido. 2. POST /configuracion con nombre, moneda y umbral válidos.",La configuración se guarda y queda como la vigente de la empresa,Alta
+HU02-CP-A-02,No duplicar la configuración vigente,HU02-CA-01,ninguno,1. POST /configuracion. 2. POST /configuracion otra vez para la misma empresa.,Debe quedar una sola configuración vigente; la segunda reemplaza a la primera y no se crea un duplicado,Alta
+HU02-CP-A-03,Rechazar configuración con campos obligatorios vacíos,HU02-CA-02,ninguno,"1. POST /configuracion sin nombre de empresa, sin moneda o sin umbral.",Responde 400 con mensaje de validación y no guarda el registro,Alta
+HU02-CP-A-04,Rechazar guardar configuración sin sesión,HU02-CA-03,ninguno,1. POST /configuracion sin cabecera Authorization.,401 y la configuración no se guarda,Alta
+HU02-CP-A-05,Rechazar carga de Excel sin sesión,HU02-CA-03,ninguno,1. POST /clientes/importar-vip sin token.,401 y no se procesa el archivo,Alta
+HU02-CP-A-06,Consultar la configuración vigente,HU02-CA-06,ninguno,1. Guardar una configuración. 2. Consultar la configuración vigente por API.,Se puede obtener la configuración vigente para que otros módulos la consuman,Media
+HU02-CP-A-07,Importar clientes VIP desde Excel válido,HU02-CA-07,ninguno,1. POST /clientes/importar-vip con un Excel válido y el configuracionEmpresaId.,200 e informa la cantidad de clientes VIP actualizados,Media
+HU02-CP-A-08,Rechazar Excel con estructura incorrecta,HU02-CA-08,ninguno,1. POST /clientes/importar-vip con un archivo que no respeta la estructura esperada.,"Error controlado (400) que indica el formato esperado, sin exponer el detalle interno ni caerse",Media
+HU02-CP-A-09,Identificar fila con campos faltantes,HU02-CA-09,ninguno,1. POST /deudores/importar con un archivo que tiene una fila sin campos obligatorios.,La fila se reporta como registro inválido y no se guarda como contexto válido,Media
+HU02-CP-A-10,Aceptar cliente VIP sin cuenta bancaria,HU02-CA-11,ninguno,1. POST /clientes/importar-vip con un cliente VIP sin cuenta bancaria.,El cliente se registra; no se exige la cuenta bancaria como dato obligatorio,Media
+HU02-CP-E-01,Validación del formulario con campo vacío,HU02-CA-13,ninguno,1. Abrir la pantalla de Configuración. 2. Dejar el nombre de empresa vacío y guardar.,El formulario muestra el mensaje de validación y no envía la configuración,Baja
+HU02-CP-E-02,Vista previa de un Excel de clientes,HU02-CA-07,ninguno,"1. En la pantalla de Configuración, cargar un Excel de clientes.",Se muestra la vista previa de los registros leídos del archivo,Media
