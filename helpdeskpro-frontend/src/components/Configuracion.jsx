@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import '../App.css'
 import axios from 'axios'
 import * as XLSX from 'xlsx'
+import apiClient from '../api/apiClient'
 
-function Configuracion() {
+function Configuracion({ esAdministrador = false }) {
 
-  const [seccion, setSeccion] = useState("")
+  const [seccion, setSeccion] = useState("asistente")
   const [vistaFactoring, setVistaFactoring] = useState("")
 
   // ==========================================
@@ -59,6 +60,85 @@ function Configuracion() {
   const [perdidaNoVipMax, setPerdidaNoVipMax] = useState('')
   const [situacionesRiesgosas, setSituacionesRiesgosas] = useState("")
 
+  // ==========================================
+  // INTEGRACIÓN GMAIL
+  // ==========================================
+
+  const [gmailActivo, setGmailActivo] = useState(false)
+  const [gmailCargando, setGmailCargando] = useState(false)
+  const [gmailError, setGmailError] = useState('')
+
+  useEffect(() => {
+
+    if (!esAdministrador) {
+      return
+    }
+
+    let componenteActivo = true
+
+    apiClient.get('/integraciones/gmail/status')
+      .then((respuesta) => {
+
+        if (componenteActivo) {
+          setGmailActivo(
+            Boolean(respuesta.data.enabled)
+          )
+        }
+
+      })
+      .catch(() => {
+
+        if (componenteActivo) {
+          setGmailError(
+            'No se pudo consultar el estado de Gmail.'
+          )
+        }
+
+      })
+
+    return () => {
+      componenteActivo = false
+    }
+
+  }, [esAdministrador])
+
+
+  const cambiarEstadoGmail = async (event) => {
+
+    const nuevoEstado = event.target.checked
+    const estadoAnterior = gmailActivo
+
+    setGmailActivo(nuevoEstado)
+    setGmailCargando(true)
+    setGmailError('')
+
+    try {
+
+      const respuesta = await apiClient.post(
+        `/integraciones/gmail/activation?enabled=${nuevoEstado}`
+      )
+
+      setGmailActivo(
+        Boolean(respuesta.data.enabled)
+      )
+
+    } catch (error) {
+
+      setGmailActivo(estadoAnterior)
+
+      setGmailError(
+        error.response?.data?.message ||
+        'No se pudo actualizar la conexión de Gmail.'
+      )
+
+    } finally {
+
+      setGmailCargando(false)
+
+    }
+
+  }
+
 
   // ==========================================
   // LEER EXCEL DE USUARIOS
@@ -81,18 +161,24 @@ function Configuracion() {
       })
 
       if (!libro.SheetNames.length) {
-        throw new Error("El archivo no contiene hojas.")
+        throw new Error(
+          "El archivo no contiene hojas."
+        )
       }
 
-      const nombrePrimeraHoja = libro.SheetNames[0]
-      const hoja = libro.Sheets[nombrePrimeraHoja]
+      const nombrePrimeraHoja =
+        libro.SheetNames[0]
 
-      const datosExcel = XLSX.utils.sheet_to_json(
-        hoja,
-        {
-          defval: ""
-        }
-      )
+      const hoja =
+        libro.Sheets[nombrePrimeraHoja]
+
+      const datosExcel =
+        XLSX.utils.sheet_to_json(
+          hoja,
+          {
+            defval: ""
+          }
+        )
 
       setUsuariosExcel(datosExcel)
 
@@ -109,7 +195,9 @@ function Configuracion() {
       alert(
         "No se pudo leer el archivo Excel de usuarios."
       )
+
     }
+
   }
 
 
@@ -134,18 +222,24 @@ function Configuracion() {
       })
 
       if (!libro.SheetNames.length) {
-        throw new Error("El archivo no contiene hojas.")
+        throw new Error(
+          "El archivo no contiene hojas."
+        )
       }
 
-      const nombrePrimeraHoja = libro.SheetNames[0]
-      const hoja = libro.Sheets[nombrePrimeraHoja]
+      const nombrePrimeraHoja =
+        libro.SheetNames[0]
 
-      const datosExcel = XLSX.utils.sheet_to_json(
-        hoja,
-        {
-          defval: ""
-        }
-      )
+      const hoja =
+        libro.Sheets[nombrePrimeraHoja]
+
+      const datosExcel =
+        XLSX.utils.sheet_to_json(
+          hoja,
+          {
+            defval: ""
+          }
+        )
 
       setClientesExcel(datosExcel)
 
@@ -162,7 +256,9 @@ function Configuracion() {
       alert(
         "No se pudo leer el archivo Excel de clientes."
       )
+
     }
+
   }
 
 
@@ -187,18 +283,24 @@ function Configuracion() {
       })
 
       if (!libro.SheetNames.length) {
-        throw new Error("El archivo no contiene hojas.")
+        throw new Error(
+          "El archivo no contiene hojas."
+        )
       }
 
-      const nombrePrimeraHoja = libro.SheetNames[0]
-      const hoja = libro.Sheets[nombrePrimeraHoja]
+      const nombrePrimeraHoja =
+        libro.SheetNames[0]
 
-      const datosExcel = XLSX.utils.sheet_to_json(
-        hoja,
-        {
-          defval: ""
-        }
-      )
+      const hoja =
+        libro.Sheets[nombrePrimeraHoja]
+
+      const datosExcel =
+        XLSX.utils.sheet_to_json(
+          hoja,
+          {
+            defval: ""
+          }
+        )
 
       setDeudoresExcel(datosExcel)
 
@@ -215,7 +317,9 @@ function Configuracion() {
       alert(
         "No se pudo leer el archivo Excel de deudores."
       )
+
     }
+
   }
 
 
@@ -249,6 +353,7 @@ function Configuracion() {
       )
 
       return
+
     }
 
 
@@ -266,6 +371,7 @@ function Configuracion() {
       )
 
       return
+
     }
 
 
@@ -283,6 +389,7 @@ function Configuracion() {
       )
 
       return
+
     }
 
 
@@ -329,6 +436,7 @@ function Configuracion() {
       )
 
       return
+
     }
 
 
@@ -338,57 +446,58 @@ function Configuracion() {
       // 1. GUARDAR CONFIGURACIÓN GENERAL
       // ==========================================
 
-      const respuestaConfiguracion = await axios.post(
-        "http://localhost:8080/configuracion",
-        {
+      const respuestaConfiguracion =
+        await apiClient.post(
+          "/configuracion",
+          {
 
-          nombreEmpresa,
+            nombreEmpresa,
 
-          moneda,
+            moneda,
 
-          umbralMontoRelevante:
-            Number(
-              umbralMontoRelevante
-            ),
+            umbralMontoRelevante:
+              Number(
+                umbralMontoRelevante
+              ),
 
-          cantidadColaboradores:
-            Number(
-              cantidadColaboradores
-            ),
+            cantidadColaboradores:
+              Number(
+                cantidadColaboradores
+              ),
 
-          areasCriticas,
+            areasCriticas,
 
-          documentosRecibidosDiariamente,
+            documentosRecibidosDiariamente,
 
-          promedioOperacionesDiarias:
-            Number(
-              promedioOperacionesDiarias
-            ),
+            promedioOperacionesDiarias:
+              Number(
+                promedioOperacionesDiarias
+              ),
 
-          perdidaMinVip:
-            Number(
-              perdidaVipMin
-            ),
+            perdidaMinVip:
+              Number(
+                perdidaVipMin
+              ),
 
-          perdidaMaxVip:
-            Number(
-              perdidaVipMax
-            ),
+            perdidaMaxVip:
+              Number(
+                perdidaVipMax
+              ),
 
-          perdidaMinNoVip:
-            Number(
-              perdidaNoVipMin
-            ),
+            perdidaMinNoVip:
+              Number(
+                perdidaNoVipMin
+              ),
 
-          perdidaMaxNoVip:
-            Number(
-              perdidaNoVipMax
-            ),
+            perdidaMaxNoVip:
+              Number(
+                perdidaNoVipMax
+              ),
 
-          situacionesRiesgosas
+            situacionesRiesgosas
 
-        }
-      )
+          }
+        )
 
 
       const configuracionEmpresaId =
@@ -419,6 +528,7 @@ function Configuracion() {
 
           }
         )
+
       }
 
 
@@ -451,6 +561,7 @@ function Configuracion() {
             }
           }
         )
+
       }
 
 
@@ -469,8 +580,8 @@ function Configuracion() {
         )
 
         datosDeudores.append(
-            "configuracionEmpresaId",
-            configuracionEmpresaId
+          "configuracionEmpresaId",
+          configuracionEmpresaId
         )
 
         await axios.post(
@@ -483,6 +594,7 @@ function Configuracion() {
             }
           }
         )
+
       }
 
 
@@ -501,15 +613,12 @@ function Configuracion() {
         error
       )
 
-      console.error(
-        "Respuesta del servidor:",
-        error.response?.data
-      )
-
       alert(
         "No se pudo guardar la configuración."
       )
+
     }
+
   }
 
 
@@ -520,7 +629,6 @@ function Configuracion() {
   return (
 
     <div className="configuracion-container">
-
 
       {/* ======================================
           ENCABEZADO
@@ -548,33 +656,35 @@ function Configuracion() {
 
       <div className="configuracion-tabs">
 
-        <button
-          className={
-            seccion === "integraciones"
-              ? "tab-activa"
-              : ""
-          }
-          onClick={() =>
-            setSeccion("integraciones")
-          }
-        >
-          Integraciones
-        </button>
+        {esAdministrador && (
+          <>
+            <button
+              className={
+                seccion === "integraciones"
+                  ? "tab-activa"
+                  : ""
+              }
+              onClick={() =>
+                setSeccion("integraciones")
+              }
+            >
+              Integraciones
+            </button>
 
-
-        <button
-          className={
-            seccion === "usuarios"
-              ? "tab-activa"
-              : ""
-          }
-          onClick={() =>
-            setSeccion("usuarios")
-          }
-        >
-          Usuarios y Roles
-        </button>
-
+            <button
+              className={
+                seccion === "usuarios"
+                  ? "tab-activa"
+                  : ""
+              }
+              onClick={() =>
+                setSeccion("usuarios")
+              }
+            >
+              Usuarios y Roles
+            </button>
+          </>
+        )}
 
         <button
           className={
@@ -603,79 +713,286 @@ function Configuracion() {
             INTEGRACIONES
         ===================================== */}
 
-        {seccion === "integraciones" && (
+        {esAdministrador &&
+          seccion === "integraciones" && (
 
-          <div className="asistente-datos">
+            <div className="integraciones-panel">
 
-            <div className="asistente-header">
+              <div className="integraciones-header">
 
-              <h2>
-                Integraciones
-              </h2>
+                <div>
 
-              <p>
-                Conecte las herramientas
-                utilizadas por su organización.
-              </p>
+                  <h2>
+                    Conexiones disponibles
+                  </h2>
+
+                  <p>
+                    Activa la fuente de correo que utilizará
+                    FactSafe para recibir eventos.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <div className="integraciones-grid">
+
+                {/* ==================================
+                    GMAIL
+                =================================== */}
+
+                <article
+                  className={
+                    `integracion-card ${
+                      gmailActivo
+                        ? 'integracion-card-activa'
+                        : ''
+                    }`
+                  }
+                >
+
+                  <div className="integracion-card-topline">
+
+                    <span
+                      className="integracion-icono"
+                      aria-hidden="true"
+                    >
+                      ✉
+                    </span>
+
+                    <label className="integracion-switch">
+
+                      <input
+                        type="checkbox"
+                        checked={gmailActivo}
+                        onChange={cambiarEstadoGmail}
+                        disabled={gmailCargando}
+                        aria-label="Activar Gmail"
+                      />
+
+                      <span className="integracion-slider" />
+
+                    </label>
+
+                  </div>
+
+
+                  <h3>
+                    Gmail
+                  </h3>
+
+
+                  <p>
+                    Analiza correos entrantes de Google Workspace
+                    contra tu configuración.
+                  </p>
+
+
+                  <span
+                    className={
+                      `integracion-estado ${
+                        gmailActivo
+                          ? 'integracion-estado-activa'
+                          : ''
+                      }`
+                    }
+                  >
+                    {
+                      gmailCargando
+                        ? 'Actualizando...'
+                        : gmailActivo
+                          ? 'Activo'
+                          : 'Inactivo'
+                    }
+                  </span>
+
+                </article>
+
+
+                {/* ==================================
+                    OUTLOOK
+                =================================== */}
+
+                <article
+                  className="integracion-card integracion-card-deshabilitada"
+                >
+
+                  <div className="integracion-card-topline">
+
+                    <span
+                      className="integracion-icono"
+                      aria-hidden="true"
+                    >
+                      ✉
+                    </span>
+
+                    <span
+                      className="integracion-switch integracion-switch-disabled"
+                      aria-hidden="true"
+                    >
+                      <span className="integracion-slider" />
+                    </span>
+
+                  </div>
+
+
+                  <h3>
+                    Microsoft Outlook
+                  </h3>
+
+
+                  <p>
+                    Esta integración no está disponible
+                    en el MVP.
+                  </p>
+
+
+                  <span className="integracion-estado">
+                    No disponible
+                  </span>
+
+                </article>
+
+
+                {/* ==================================
+                    WHATSAPP
+                =================================== */}
+
+                <article
+                  className="integracion-card integracion-card-deshabilitada"
+                >
+
+                  <div className="integracion-card-topline">
+
+                    <span
+                      className="integracion-icono"
+                      aria-hidden="true"
+                    >
+                      ♙
+                    </span>
+
+                    <span
+                      className="integracion-switch integracion-switch-disabled"
+                      aria-hidden="true"
+                    >
+                      <span className="integracion-slider" />
+                    </span>
+
+                  </div>
+
+
+                  <h3>
+                    WhatsApp Business
+                  </h3>
+
+
+                  <p>
+                    Las alertas por WhatsApp están
+                    fuera del alcance del MVP.
+                  </p>
+
+
+                  <span className="integracion-estado">
+                    No disponible
+                  </span>
+
+                </article>
+
+
+                {/* ==================================
+                    TEAMS
+                =================================== */}
+
+                <article
+                  className="integracion-card integracion-card-deshabilitada"
+                >
+
+                  <div className="integracion-card-topline">
+
+                    <span
+                      className="integracion-icono"
+                      aria-hidden="true"
+                    >
+                      ♙
+                    </span>
+
+                    <span
+                      className="integracion-switch integracion-switch-disabled"
+                      aria-hidden="true"
+                    >
+                      <span className="integracion-slider" />
+                    </span>
+
+                  </div>
+
+
+                  <h3>
+                    Microsoft Teams
+                  </h3>
+
+
+                  <p>
+                    Las alertas por Teams están
+                    fuera del alcance del MVP.
+                  </p>
+
+
+                  <span className="integracion-estado">
+                    No disponible
+                  </span>
+
+                </article>
+
+              </div>
+
+
+              {/* ==================================
+                  ERROR GMAIL
+              =================================== */}
+
+              {gmailError && (
+
+                <p
+                  className="integraciones-error"
+                  role="alert"
+                >
+                  {gmailError}
+                </p>
+
+              )}
 
             </div>
 
-
-            <div className="asistente-campo">
-
-              <label>
-                Microsoft 365
-              </label>
-
-              <button>
-                Conectar
-              </button>
-
-            </div>
-
-
-            <div className="asistente-campo">
-
-              <label>
-                Google Workspace
-              </label>
-
-              <button>
-                Conectar
-              </button>
-
-            </div>
-
-          </div>
-
-        )}
+          )}
 
 
         {/* ====================================
             USUARIOS Y ROLES
         ===================================== */}
 
-        {seccion === "usuarios" && (
+        {esAdministrador &&
+          seccion === "usuarios" && (
 
-          <div className="asistente-datos">
+            <div className="asistente-datos">
 
-            <div className="asistente-header">
+              <div className="asistente-header">
 
-              <h2>
-                Usuarios y Roles
-              </h2>
+                <h2>
+                  Usuarios y Roles
+                </h2>
 
-              <p>
-                La administración de usuarios
-                se encuentra disponible desde
-                el módulo correspondiente.
-              </p>
+                <p>
+                  La administración de usuarios
+                  se encuentra disponible desde
+                  el módulo correspondiente.
+                </p>
+
+              </div>
 
             </div>
 
-          </div>
-
-        )}
+          )}
 
 
         {/* ====================================
@@ -685,7 +1002,6 @@ function Configuracion() {
         {seccion === "asistente" && (
 
           <div className="asistente-datos">
-
 
             <div className="asistente-header">
 
@@ -918,7 +1234,9 @@ function Configuracion() {
             </div>
 
 
-            {/* BOTÓN VISUALIZAR USUARIOS */}
+            {/* ==================================
+                BOTÓN VISUALIZAR USUARIOS
+            =================================== */}
 
             {usuariosExcel.length > 0 && (
 
@@ -945,7 +1263,9 @@ function Configuracion() {
             )}
 
 
-            {/* TABLA USUARIOS */}
+            {/* ==================================
+                TABLA USUARIOS
+            =================================== */}
 
             {mostrarUsuariosExcel &&
               usuariosExcel.length > 0 && (
@@ -1634,7 +1954,9 @@ function Configuracion() {
       </div>
 
     </div>
+
   )
+
 }
 
 export default Configuracion

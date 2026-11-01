@@ -7,5 +7,8 @@ import java.util.Optional;
 public interface DeudorRepository
         extends JpaRepository<Deudor, Long> {
         Optional<Deudor> findByRuc(String ruc);
+        Optional<Deudor> findByCorreoAutorizadoIgnoreCase(String correo);
+
+        Optional<Deudor> findByDominioAutorizadoIgnoreCase(String dominio);
 
 }

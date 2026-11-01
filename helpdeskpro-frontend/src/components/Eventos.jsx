@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import '../App.css'
+import apiClient from '../api/apiClient'
 
 function Eventos() {
 
@@ -31,34 +31,45 @@ function Eventos() {
 
   const [dominioRegistrado, setDominioRegistrado] = useState("")
 
+  
   // =====================================================
-  // OBTENER EVENTOS
+  // OBTENER EVENTOS Y ACTUALIZAR AUTOMÁTICAMENTE
   // =====================================================
 
   useEffect(() => {
+    let componenteActivo = true
 
-    obtenerEventos()
+    async function cargarEventos() {
+      try {
+        const respuesta = await apiClient.get("/eventos")
 
-  }, [])
+        console.log("RESPUESTA DEL BACKEND:", respuesta.data)
+        console.log("¿ES UNA LISTA?:", Array.isArray(respuesta.data))
 
+        if (componenteActivo) {
+          setEventos(respuesta.data)
+        }
 
-  async function obtenerEventos() {
-
-    try {
-
-      const respuesta = await axios.get(
-        "http://localhost:8080/eventos"
-      )
-
-      setEventos(respuesta.data)
-
-    } catch (error) {
-
-      console.error("Error al obtener eventos:", error)
-
+      } catch (error) {
+        console.error("Error al obtener eventos:", error)
+      }
     }
 
-  }
+    // Primera consulta al ingresar al módulo
+    cargarEventos()
+
+    // Volver a consultar cada 5 segundos
+    const intervalo = setInterval(() => {
+      cargarEventos()
+    }, 5000)
+
+    // Limpiar cuando salimos del componente
+    return () => {
+      componenteActivo = false
+      clearInterval(intervalo)
+    }
+
+  }, [])
 
 
   // =====================================================
@@ -85,8 +96,8 @@ function Eventos() {
       }
 
 
-      const respuesta = await axios.post(
-        "http://localhost:8080/eventos",
+      const respuesta = await apiClient.post(
+        "/eventos",
         nuevoEvento
       )
 
