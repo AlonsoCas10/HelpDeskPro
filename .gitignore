@@ -3,6 +3,10 @@ helpdeskpro-frontend/dist/
 
 helpdeskpro-backend/target/
 
+logs/
+logs/backend.log
+logs/frontend.log
+
 .vscode/
 .github/
 .idea/
