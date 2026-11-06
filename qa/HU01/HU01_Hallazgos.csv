@@ -1,8 +1,8 @@
-﻿id,titulo,donde,evidencia,detectado_por,criterio_aceptacion
-HU01-HZ-01,Revisión de acceso pendiente,Backend,Detalle fuera del repo,exploración,
-HU01-HZ-02,El frontend y el backend tratan distinto el nombre del grupo de administrador,App.jsx y SecurityConfig,El backend convierte el grupo a mayúsculas y el frontend exige exactamente Administrador; falta confirmar el nombre real en Cognito,exploración,
-HU01-HZ-03,Revisión de permisos por rol pendiente,Backend,Detalle fuera del repo,exploración,
-HU01-HZ-04,El frontend no maneja el 401 de una sesión expirada,api/apiClient.js y App.jsx,No hay interceptor de respuesta ni reacción a un 401; la especificación pide redirigir al inicio de sesión. Falta comprobarlo en el navegador,exploración,
-HU01-HZ-05,Los errores de inicio de sesión muestran el mensaje técnico,App.jsx,Se muestra auth.error.message sin traducir; la especificación pide no revelar información técnica. Falta comprobarlo en el navegador,exploración,
-HU01-HZ-06,Falta confirmar si el registro abierto es compatible con acceso solo autorizado,App.jsx y configuración de Cognito,El botón ofrece registrarse y el backend acepta tokens sin grupos; no se revisó la configuración de Cognito,exploración,
-HU01-HZ-07,Queda código residual en la capa de acceso,"PublicController, PrivateController, HomeController y config/WebConfig.java","Dos controladores sin @RestController, GET / con el nombre anterior del producto y WebConfig fuera de src",exploración,
+﻿id,titulo,donde,evidencia,detectado_por,criterio_aceptacion,tipo,severidad
+HU01-HZ-01,Revisión de acceso pendiente,Backend,Detalle fuera del repo,exploración,HU01-CA-05,error,Alta
+HU01-HZ-02,El frontend y el backend tratan distinto el nombre del grupo de administrador,App.jsx y SecurityConfig,El backend convierte el grupo a mayúsculas y el frontend exige exactamente Administrador; falta confirmar el nombre real en Cognito,exploración,HU01-CA-09,error,Media
+HU01-HZ-03,Revisión de permisos por rol pendiente,Backend,Detalle fuera del repo,exploración,HU01-CA-08,falta,Alta
+HU01-HZ-04,El frontend no maneja el 401 de una sesión expirada,api/apiClient.js y App.jsx,No hay interceptor de respuesta ni reacción a un 401; la especificación pide redirigir al inicio de sesión. Falta comprobarlo en el navegador,exploración,HU01-CA-06,falta,Media
+HU01-HZ-05,Los errores de inicio de sesión muestran el mensaje técnico,App.jsx,Se muestra auth.error.message sin traducir; la especificación pide no revelar información técnica. Falta comprobarlo en el navegador,exploración,HU01-CA-11,error,Media
+HU01-HZ-06,Falta confirmar si el registro abierto es compatible con acceso solo autorizado,App.jsx y configuración de Cognito,El botón ofrece registrarse y el backend acepta tokens sin grupos; no se revisó la configuración de Cognito,exploración,HU01-CA-10,falta,Media
+HU01-HZ-07,Queda código residual en la capa de acceso,"PublicController, PrivateController, HomeController y config/WebConfig.java","Dos controladores sin @RestController, GET / con el nombre anterior del producto y WebConfig fuera de src",exploración,HU01-CA-12,error,Baja
