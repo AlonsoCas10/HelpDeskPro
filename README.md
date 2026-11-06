@@ -6,7 +6,7 @@ Si trabajan desde ...
 Antes de la primera vez, crear estos archivos (no se suben a git; pide los valores al equipo):
 
 - helpdeskpro-db/.env                (copiar de .env.example)
-- helpdeskpro-backend/.env           COGNITO_JWK_SET_URI, COGNITO_ISSUER_URI, COGNITO_CLIENT_ID, DB_PASSWORD
+- helpdeskpro-backend/.env           COGNITO_JWK_SET_URI, COGNITO_ISSUER_URI, COGNITO_CLIENT_ID, DB_NAME, DB_USER, DB_PASSWORD
 - helpdeskpro-frontend/.env.local    VITE_API_URL, VITE_COGNITO_AUTHORITY, VITE_COGNITO_CLIENT_ID,
                                      VITE_COGNITO_REDIRECT_URI, VITE_COGNITO_DOMAIN, VITE_COGNITO_LOGOUT_URI
 
