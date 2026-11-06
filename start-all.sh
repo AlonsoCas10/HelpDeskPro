@@ -88,8 +88,9 @@ fi
 
 # El backend lee helpdeskpro-backend/.env gracias a spring.config.import en application.properties.
 # SecurityConfig.java usa @Value("${COGNITO_...}") SIN valor por defecto: si falta, Spring no arranca.
+# application.properties usa ${DB_PASSWORD} igual, y debe coincidir con DB_PASSWORD de helpdeskpro-db/.env.
 BACKEND_ENV="$ROOT_DIR/helpdeskpro-backend/.env"
-for var in COGNITO_JWK_SET_URI COGNITO_ISSUER_URI COGNITO_CLIENT_ID; do
+for var in COGNITO_JWK_SET_URI COGNITO_ISSUER_URI COGNITO_CLIENT_ID DB_PASSWORD; do
   has_var "$BACKEND_ENV" "$var" || errors+=("Backend: falta $var en helpdeskpro-backend/.env")
 done
 
