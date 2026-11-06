@@ -1,3 +1,4 @@
+
 package com.helpdeskpro.helpdeskpro_backend.service;
 
 import com.helpdeskpro.helpdeskpro_backend.model.Evento;
@@ -16,40 +17,62 @@ public class EventoService {
 
     @Autowired
     private EvaluadorRiesgoService evaluadorRiesgoService;
-    
-public Evento guardarEvento(Evento evento) {
 
-    // Calculamos automáticamente el Risk Score
-    int puntosRemitente = evaluadorRiesgoService.evaluarRemitente(
-            evento.getRemitente(),
-            evento.getDominioRegistrado(),
-            evento.getRemitenteConocido()
+    // =====================================================
+    // GUARDAR EVENTO
+    // =====================================================
 
-        );
+    public Evento guardarEvento(Evento evento) {
 
-    // Guardamos el resultado en el evento
-    evento.setRiskScore(puntosRemitente);
+        // Si el remitente está vacío, utilizamos el correo
+        // obtenido mediante la integración con Gmail.
+        if ((evento.getRemitente() == null
+                || evento.getRemitente().isBlank())
+                && evento.getCorreoRemitente() != null) {
 
-    // Guardamos el evento
-    Evento eventoGuardado = eventoRepository.save(evento);
+            evento.setRemitente(evento.getCorreoRemitente());
+        }
 
-    // Obtenemos el ID generado por SQL Server
-    Long id = eventoGuardado.getId();
+        // =================================================
+        // EVALUAR LOS CINCO CRITERIOS DE RIESGO
+        // =================================================
 
-    // Creamos la identificación
-    String codigo = String.format("INC-%03d", id);
+        int riesgoTotal =
+                evaluadorRiesgoService.evaluarRiesgo(evento);
 
-    // Asignamos el código
-    eventoGuardado.setCodigo(codigo);
+        evento.setRiskScore(riesgoTotal);
 
-    // Guardamos nuevamente el evento
-    return eventoRepository.save(eventoGuardado);
-}
+        // =================================================
+        // PRIMER GUARDADO
+        // =================================================
 
+        Evento eventoGuardado = eventoRepository.save(evento);
+
+        // =================================================
+        // GENERAR CÓDIGO DEL INCIDENTE
+        // =================================================
+
+        if (eventoGuardado.getCodigo() == null
+                || eventoGuardado.getCodigo().isBlank()) {
+
+            String codigo = String.format(
+                    "INC-%03d",
+                    eventoGuardado.getId()
+            );
+
+            eventoGuardado.setCodigo(codigo);
+
+            eventoGuardado = eventoRepository.save(eventoGuardado);
+        }
+
+        return eventoGuardado;
+    }
+
+    // =====================================================
+    // LISTAR EVENTOS
+    // =====================================================
 
     public List<Evento> listarEventos() {
-
         return eventoRepository.findAll();
-
     }
 }

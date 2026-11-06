@@ -9,4 +9,8 @@ public interface ClienteRepository
         extends JpaRepository<Cliente, Long> {
     Optional<Cliente> findByRuc(String ruc);
 
+    Optional<Cliente> findByCorreoAutorizadoIgnoreCase(String correo);
+
+    Optional<Cliente> findByDominioAutorizadoIgnoreCase(String dominio);
+
 }

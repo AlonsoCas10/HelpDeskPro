@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import '../App.css'
 import apiClient from '../api/apiClient'
 
@@ -31,26 +31,56 @@ function Eventos() {
 
   const [dominioRegistrado, setDominioRegistrado] = useState("")
 
+  
+
+  
   // =====================================================
-  // OBTENER EVENTOS
+  // OBTENER EVENTOS Y ACTUALIZAR AUTOMÁTICAMENTE
   // =====================================================
 
   useEffect(() => {
     let componenteActivo = true
 
-    apiClient.get("/eventos")
-      .then((respuesta) => {
-        if (componenteActivo) {
-          setEventos(respuesta.data)
-        }
-      })
-      .catch((error) => {
-        console.error("Error al obtener eventos:", error)
-      })
+    async function cargarEventos() {
+      try {
+        const respuesta = await apiClient.get("/eventos")
 
+        
+      console.log("RESPUESTA DEL BACKEND:", respuesta.data)
+      console.log("¿ES UNA LISTA?:", Array.isArray(respuesta.data))
+
+      if (componenteActivo) {
+        if (Array.isArray(respuesta.data)) {
+          setEventos(respuesta.data)
+        } else {
+          console.warn(
+            "La respuesta de /eventos no es una lista:",
+            respuesta.data
+          )
+          setEventos([])
+        }
+      }
+
+
+      } catch (error) {
+        console.error("Error al obtener eventos:", error)
+      }
+    }
+
+    // Primera consulta al ingresar al módulo
+    cargarEventos()
+
+    // Volver a consultar cada 5 segundos
+    const intervalo = setInterval(() => {
+      cargarEventos()
+    }, 5000)
+
+    // Limpiar cuando salimos del componente
     return () => {
       componenteActivo = false
+      clearInterval(intervalo)
     }
+
   }, [])
 
 
@@ -141,6 +171,7 @@ function Eventos() {
     )
 
   })
+
 
 
   // =====================================================
@@ -607,19 +638,20 @@ function Eventos() {
           </button>
 
 
+          
           {/* INFORMACIÓN DEL EVENTO */}
           <div className="detalle-header">
 
-            <p>
-              <strong>Id del evento:</strong>{" "}
-              {eventoSeleccionado.codigo}
-            </p>
+            <div className="detalle-header-info">
+              <h1>{eventoSeleccionado.codigo}</h1>
 
-            <h1>
-              Posible Business Email Compromise (BEC)
-            </h1>
+              <p>
+                {eventoSeleccionado.asunto || "Evento de correo electrónico"}
+              </p>
+            </div>
 
           </div>
+
 
 
           {/* 5 OPCIONES */}
@@ -684,6 +716,9 @@ function Eventos() {
 
 
           {/* DOS TARJETAS */}
+          
+          {seccionDetalle === "Resumen" && (
+
           <div className="detalle-cards">
 
 
@@ -697,44 +732,55 @@ function Eventos() {
                 Información del correo
               </h2>
 
-              <div className="detalle-info">
+              
+            <div className="detalle-info">
 
-                <p>
-                  <strong>Remitente:</strong>
-                  {eventoSeleccionado.remitente}
-                </p>
+              <p>
+                <strong>Remitente:</strong>
+                {eventoSeleccionado.remitente || "No disponible"}
+              </p>
 
-                <p>
-                  <strong>Asunto:</strong>
-                  {eventoSeleccionado.asunto}
-                </p>
+              <p>
+                <strong>Asunto:</strong>
+                {eventoSeleccionado.asunto || "No disponible"}
+              </p>
 
-                <p>
-                  <strong>Fecha:</strong>
-                  {eventoSeleccionado.fechaHora}
-                </p>
+              <p>
+                <strong>Fecha:</strong>
+                {eventoSeleccionado.fechaHora
+                  ? new Date(eventoSeleccionado.fechaHora).toLocaleString("es-PE")
+                  : "No disponible"}
+              </p>
 
-                <p>
-                  <strong>Para:</strong>
-                  {eventoSeleccionado.destinatario}
-                </p>
+              <p>
+                <strong>Para:</strong>
+                {eventoSeleccionado.destinatario || "No disponible"}
+              </p>
 
-                <p>
-                  <strong>Clasificación:</strong>
-                  {eventoSeleccionado.clasificacion}
-                </p>
+              <p>
+                <strong>Clasificación:</strong>
+                {eventoSeleccionado.clasificacion || "No disponible"}
+              </p>
 
-                <p>
-                  <strong>Estado:</strong>
-                  {eventoSeleccionado.estado}
-                </p>
+              <p>
+                <strong>Estado:</strong>
+                {eventoSeleccionado.estado || "No disponible"}
+              </p>
 
-                <p>
-                  <strong>Adjunto:</strong>
-                  {eventoSeleccionado.adjunto}
-                </p>
+              <p>
+                <strong>Adjunto:</strong>
+                {eventoSeleccionado.adjunto ||
+                  (eventoSeleccionado.archivos?.length > 0
+                    ? eventoSeleccionado.archivos
+                        .map((archivo) =>
+                          archivo.nombre || archivo.nombreArchivo || "Archivo adjunto"
+                        )
+                        .join(", ")
+                    : "Sin adjuntos")}
+              </p>
 
-              </div>
+            </div>
+
 
 
               {/* RISK SCORE */}
@@ -745,7 +791,23 @@ function Eventos() {
                   Risk Score
                 </h3>
 
-                <div className="risk-circle">
+                
+<div
+  className="risk-circle"
+  style={{
+    borderColor:
+      eventoSeleccionado.riskScore == null
+        ? "#94a3b8"
+        : eventoSeleccionado.riskScore <= 25
+          ? "#22c55e"
+          : eventoSeleccionado.riskScore <= 50
+            ? "#eab308"
+            : eventoSeleccionado.riskScore <= 75
+              ? "#f97316"
+              : "#ef4444"
+  }}
+>
+
 
                   <span>
                     {eventoSeleccionado.riskScore}
@@ -761,9 +823,33 @@ function Eventos() {
                   Nivel de riesgo
                 </p>
 
-                <strong className="nivel-riesgo">
-                  {eventoSeleccionado.clasificacion}
-                </strong>
+                
+            <strong
+              className="nivel-riesgo"
+              style={{
+                color:
+                  eventoSeleccionado.riskScore == null
+                    ? "#64748b"
+                    : eventoSeleccionado.riskScore <= 25
+                      ? "#22c55e"
+                      : eventoSeleccionado.riskScore <= 50
+                        ? "#ca8a04"
+                        : eventoSeleccionado.riskScore <= 75
+                          ? "#f97316"
+                          : "#ef4444"
+              }}
+            >
+              {eventoSeleccionado.riskScore == null
+                ? "Sin evaluar"
+                : eventoSeleccionado.riskScore <= 25
+                  ? "Bajo"
+                  : eventoSeleccionado.riskScore <= 50
+                    ? "Medio"
+                    : eventoSeleccionado.riskScore <= 75
+                      ? "Alto"
+                      : "Crítico"}
+            </strong>
+
 
               </div>
 
@@ -787,8 +873,12 @@ function Eventos() {
                 </button>
 
               </div>
+            
+            
+</div>
 
-            </div>
+
+
 
 
             {/* TARJETA 2 */}
@@ -966,12 +1056,15 @@ function Eventos() {
 
 </div>
 
+
 </div>
 
-          </div>
+</div>
+)}
 
-        </div>
-      )}
+</div>
+)}
+
 
     </div>
 
