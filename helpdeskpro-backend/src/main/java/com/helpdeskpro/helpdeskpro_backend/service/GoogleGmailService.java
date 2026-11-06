@@ -1,3 +1,4 @@
+
 package com.helpdeskpro.helpdeskpro_backend.service;
 
 import java.io.IOException;
@@ -25,7 +26,9 @@ import com.google.api.services.gmail.model.WatchResponse;
 
 @Service
 public class GoogleGmailService {
-    private static final GsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+
+    private static final GsonFactory JSON_FACTORY =
+            GsonFactory.getDefaultInstance();
 
     private final String clientId;
     private final String clientSecret;
@@ -34,8 +37,12 @@ public class GoogleGmailService {
     private final String pubsubTopic;
     private final String expectedEmail;
     private final Gmail configuredGmailClient;
-    private final AtomicReference<BigInteger> historyId = new AtomicReference<>();
-    private final GoogleGmailMessageParser messageParser = new GoogleGmailMessageParser();
+
+    private final AtomicReference<BigInteger> historyId =
+            new AtomicReference<>();
+
+    private final GoogleGmailMessageParser messageParser =
+            new GoogleGmailMessageParser();
 
     @Autowired
     public GoogleGmailService(
@@ -45,11 +52,28 @@ public class GoogleGmailService {
             @Value("${google.gmail.application-name}") String applicationName,
             @Value("${google.gmail.pubsub.topic:}") String pubsubTopic,
             @Value("${google.gmail.expected-email:}") String expectedEmail) {
-        this(clientId, clientSecret, refreshToken, applicationName, pubsubTopic, expectedEmail, null);
+
+        this(
+                clientId,
+                clientSecret,
+                refreshToken,
+                applicationName,
+                pubsubTopic,
+                expectedEmail,
+                null
+        );
     }
 
     GoogleGmailService(Gmail gmailClient) {
-        this("test-client-id", "test-client-secret", "test-refresh-token", "test-application", "", "", gmailClient);
+        this(
+                "test-client-id",
+                "test-client-secret",
+                "test-refresh-token",
+                "test-application",
+                "",
+                "",
+                gmailClient
+        );
     }
 
     private GoogleGmailService(
@@ -60,6 +84,7 @@ public class GoogleGmailService {
             String pubsubTopic,
             String expectedEmail,
             Gmail configuredGmailClient) {
+
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.refreshToken = refreshToken;
@@ -69,108 +94,279 @@ public class GoogleGmailService {
         this.configuredGmailClient = configuredGmailClient;
     }
 
-    public GmailConnectionResult testConnection() throws IOException {
-        Gmail gmail = configuredGmailClient != null ? configuredGmailClient : createGmailClient();
-        Profile profile = gmail.users().getProfile("me").execute();
+    // =====================================================
+    // PROBAR CONEXIÓN CON GMAIL
+    // =====================================================
+
+    public GmailConnectionResult testConnection()
+            throws IOException {
+
+        Gmail gmail = configuredGmailClient != null
+                ? configuredGmailClient
+                : createGmailClient();
+
+        Profile profile = gmail.users()
+                .getProfile("me")
+                .execute();
 
         return new GmailConnectionResult(
                 "connected",
                 profile.getEmailAddress(),
                 profile.getMessagesTotal(),
-                profile.getThreadsTotal());
+                profile.getThreadsTotal()
+        );
     }
 
-    public synchronized void startWatch() throws IOException {
+    // =====================================================
+    // INICIAR GMAIL WATCH
+    // =====================================================
+
+    public synchronized void startWatch()
+            throws IOException {
+
         if (isBlank(pubsubTopic)) {
             throw new GoogleGmailConfigurationException(
-                    "Falta GOOGLE_GMAIL_PUBSUB_TOPIC con el nombre completo del tópico de Pub/Sub.");
+                    "Falta GOOGLE_GMAIL_PUBSUB_TOPIC con el nombre completo del tópico de Pub/Sub."
+            );
         }
 
-        Gmail gmail = configuredGmailClient != null ? configuredGmailClient : createGmailClient();
+        Gmail gmail = configuredGmailClient != null
+                ? configuredGmailClient
+                : createGmailClient();
+
         WatchRequest request = new WatchRequest()
-            .setTopicName(pubsubTopic)
+                .setTopicName(pubsubTopic)
                 .setLabelIds(List.of("INBOX", "SENT"))
                 .setLabelFilterBehavior("INCLUDE");
-        WatchResponse response = gmail.users().watch("me", request).execute();
-        historyId.compareAndSet(null, response.getHistoryId());
+
+        WatchResponse response = gmail.users()
+                .watch("me", request)
+                .execute();
+
+        historyId.compareAndSet(
+                null,
+                response.getHistoryId()
+        );
     }
 
-    public synchronized List<GoogleGmailMessageParser.ParsedGmailMessage> readMessagesFromNotification(
-            String emailAddress,
-            BigInteger notificationHistoryId) throws IOException {
-        if (!isBlank(expectedEmail) && !expectedEmail.equalsIgnoreCase(emailAddress)) {
+    // =====================================================
+    // RECIBIR CORREOS NUEVOS DESDE PUB/SUB
+    // =====================================================
+
+    public synchronized List<GoogleGmailMessageParser.ParsedGmailMessage>
+            readMessagesFromNotification(
+                    String emailAddress,
+                    BigInteger notificationHistoryId)
+            throws IOException {
+
+        if (!isBlank(expectedEmail)
+                && !expectedEmail.equalsIgnoreCase(emailAddress)) {
             return List.of();
         }
 
         BigInteger currentHistoryId = historyId.get();
-        if (currentHistoryId == null || notificationHistoryId.compareTo(currentHistoryId) <= 0) {
+
+        if (currentHistoryId == null
+                || notificationHistoryId.compareTo(currentHistoryId) <= 0) {
             return List.of();
         }
 
-        Gmail gmail = configuredGmailClient != null ? configuredGmailClient : createGmailClient();
-        List<GoogleGmailMessageParser.ParsedGmailMessage> messages = new ArrayList<>();
+        Gmail gmail = configuredGmailClient != null
+                ? configuredGmailClient
+                : createGmailClient();
+
+        List<GoogleGmailMessageParser.ParsedGmailMessage> messages =
+                new ArrayList<>();
+
         String pageToken = null;
 
         do {
-            Gmail.Users.History.List request = gmail.users().history()
+            Gmail.Users.History.List request = gmail.users()
+                    .history()
                     .list("me")
                     .setStartHistoryId(currentHistoryId)
                     .setHistoryTypes(List.of("messageAdded"))
                     .setPageToken(pageToken);
-            com.google.api.services.gmail.model.ListHistoryResponse response = request.execute();
+
+            com.google.api.services.gmail.model.ListHistoryResponse response =
+                    request.execute();
 
             if (response.getHistory() != null) {
+
                 for (History history : response.getHistory()) {
+
                     if (history.getMessagesAdded() == null) {
                         continue;
                     }
-                    for (HistoryMessageAdded messageAdded : history.getMessagesAdded()) {
+
+                    for (HistoryMessageAdded messageAdded
+                            : history.getMessagesAdded()) {
+
                         Message message = messageAdded.getMessage();
-                        if (message != null && message.getId() != null) {
-                            Message fullMessage = gmail.users().messages()
+
+                        if (message != null
+                                && message.getId() != null) {
+
+                            Message fullMessage = gmail.users()
+                                    .messages()
                                     .get("me", message.getId())
                                     .setFormat("full")
                                     .execute();
-                            messages.add(messageParser.parse(fullMessage));
+
+                            messages.add(
+                                    messageParser.parse(fullMessage)
+                            );
                         }
                     }
                 }
             }
+
             pageToken = response.getNextPageToken();
+
         } while (pageToken != null);
 
         historyId.set(notificationHistoryId);
+
         return messages;
     }
 
-    public boolean acceptsEmail(String emailAddress) {
-        return isBlank(expectedEmail) || expectedEmail.equalsIgnoreCase(emailAddress);
+    // =====================================================
+    // NUEVO: CONSULTAR CORREOS HISTÓRICOS DE INBOX
+    // ÚLTIMOS 30 DÍAS
+    // =====================================================
+
+    
+public List<GoogleGmailMessageParser.ParsedGmailMessage>
+        readRecentInboxMessages(int limit)
+        throws IOException {
+
+    if (limit < 0) {
+        throw new IllegalArgumentException(
+                "El límite no puede ser negativo."
+        );
     }
 
-    private Gmail createGmailClient() throws IOException {
+    Gmail gmail = configuredGmailClient != null
+            ? configuredGmailClient
+            : createGmailClient();
+
+    List<GoogleGmailMessageParser.ParsedGmailMessage> messages =
+            new ArrayList<>();
+
+    String pageToken = null;
+
+    do {
+        Gmail.Users.Messages.List request = gmail.users()
+                .messages()
+                .list("me")
+                .setLabelIds(List.of("INBOX"))
+                .setQ("newer_than:30d")
+                .setMaxResults(
+                        limit == 0
+                                ? 100L
+                                : (long) Math.min(
+                                        100,
+                                        limit - messages.size()
+                                )
+                )
+                .setPageToken(pageToken);
+
+        var response = request.execute();
+
+        if (response.getMessages() != null) {
+
+            for (Message message : response.getMessages()) {
+
+                if (message == null || message.getId() == null) {
+                    continue;
+                }
+
+                Message fullMessage = gmail.users()
+                        .messages()
+                        .get("me", message.getId())
+                        .setFormat("full")
+                        .execute();
+
+                messages.add(messageParser.parse(fullMessage));
+
+                if (limit > 0 && messages.size() >= limit) {
+                    break;
+                }
+            }
+        }
+
+        pageToken = response.getNextPageToken();
+
+    } while (pageToken != null
+            && (limit == 0 || messages.size() < limit));
+
+    return messages;
+}
+
+
+    // =====================================================
+    // VALIDAR CUENTA DE GMAIL
+    // =====================================================
+
+    public boolean acceptsEmail(String emailAddress) {
+        return isBlank(expectedEmail)
+                || expectedEmail.equalsIgnoreCase(emailAddress);
+    }
+
+    // =====================================================
+    // CREAR CLIENTE DE GMAIL
+    // =====================================================
+
+    private Gmail createGmailClient()
+            throws IOException {
+
         validateConfiguration();
 
         try {
-            HttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();
-            GoogleCredential credential = new GoogleCredential.Builder()
-                    .setTransport(transport)
-                    .setJsonFactory(JSON_FACTORY)
-                    .setClientSecrets(clientId, clientSecret)
-                    .build()
-                    .setRefreshToken(refreshToken);
+            HttpTransport transport =
+                    GoogleNetHttpTransport.newTrustedTransport();
 
-            return new Gmail.Builder(transport, JSON_FACTORY, credential)
+            GoogleCredential credential =
+                    new GoogleCredential.Builder()
+                            .setTransport(transport)
+                            .setJsonFactory(JSON_FACTORY)
+                            .setClientSecrets(
+                                    clientId,
+                                    clientSecret
+                            )
+                            .build()
+                            .setRefreshToken(refreshToken);
+
+            return new Gmail.Builder(
+                    transport,
+                    JSON_FACTORY,
+                    credential
+            )
                     .setApplicationName(applicationName)
                     .build();
+
         } catch (GeneralSecurityException exception) {
-            throw new IOException("No se pudo preparar la conexión segura con Google.", exception);
+
+            throw new IOException(
+                    "No se pudo preparar la conexión segura con Google.",
+                    exception
+            );
         }
     }
 
+    // =====================================================
+    // VALIDAR CONFIGURACIÓN
+    // =====================================================
+
     private void validateConfiguration() {
-        if (isBlank(clientId) || isBlank(clientSecret) || isBlank(refreshToken)) {
+
+        if (isBlank(clientId)
+                || isBlank(clientSecret)
+                || isBlank(refreshToken)) {
+
             throw new GoogleGmailConfigurationException(
-                    "Faltan GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET o GOOGLE_REFRESH_TOKEN en el archivo .env.");
+                    "Faltan GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET o GOOGLE_REFRESH_TOKEN en el archivo .env."
+            );
         }
     }
 
@@ -185,7 +381,9 @@ public class GoogleGmailService {
             Integer threadsTotal) {
     }
 
-    public static class GoogleGmailConfigurationException extends RuntimeException {
+    public static class GoogleGmailConfigurationException
+            extends RuntimeException {
+
         public GoogleGmailConfigurationException(String message) {
             super(message);
         }

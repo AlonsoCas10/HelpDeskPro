@@ -122,7 +122,12 @@ public class SecurityConfig {
             .sessionManagement(c->c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(autorize->
                 autorize.requestMatchers("/", "/error", "/usuarios/login", "/usuarios/registro").permitAll()
+
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/integraciones/gmail/import-recent"
+                ).hasRole("ADMINISTRADOR")
                 .anyRequest().authenticated()
             )
                 .oauth2ResourceServer(c->c.jwt(jwt -> jwt
