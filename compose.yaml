@@ -35,6 +35,24 @@ services:
       sqlserver:
         condition: service_healthy
 
+  backend:
+    build: ./helpdeskpro-backend
+    image: factsafe-backend:dev
+    env_file:
+      - ./helpdeskpro-backend/.env
+    environment:
+      DB_HOST: sqlserver
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      GOOGLE_GMAIL_PUBSUB_ENABLED: ${GOOGLE_GMAIL_PUBSUB_ENABLED:-false}
+      GOOGLE_GMAIL_HISTORICAL_SYNC_ENABLED: ${GOOGLE_GMAIL_HISTORICAL_SYNC_ENABLED:-false}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
 
 
 volumes:
