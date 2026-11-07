@@ -20,6 +20,22 @@ services:
       retries: 10
       start_period: 30s
 
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    entrypoint: ["/opt/mssql-tools18/bin/sqlcmd"]
+    command: ["-S", "sqlserver", "-U", "sa", "-C", "-b", "-i", "/init/init.sql"]
+    environment:
+      SQLCMDPASSWORD: ${MSSQL_SA_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./helpdeskpro-db/init/init.sql:/init/init.sql:ro
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+
 
 volumes:
   sqlserver_data:
