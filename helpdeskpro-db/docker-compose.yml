@@ -11,6 +11,13 @@ services:
     volumes:
       - sqlserver_data:/var/opt/mssql # persiste la base entre reinicios del contenedor
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -b -Q 'SELECT 1' -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
 
 volumes:
   sqlserver_data:
