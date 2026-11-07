@@ -1,13 +1,49 @@
-Si trabajan desde ...
+# FactSafe 
 
-1. WSL, Git Bash, Mac o Linux -> ./start-all.sh   (detener: ./stop-all.sh, o ./stop-all.sh --db para bajar también la base)
-2. PowerShell puro en Windows -> .\start-all.ps1  (detener: .\stop-all.ps1, o .\stop-all.ps1 -Db)
+## Requisitos
 
-Antes de la primera vez, crear estos archivos (no se suben a git; pide los valores al equipo):
+Solo necesitas Docker con Compose.
 
-- helpdeskpro-db/.env                (copiar de .env.example)
-- helpdeskpro-backend/.env           COGNITO_JWK_SET_URI, COGNITO_ISSUER_URI, COGNITO_CLIENT_ID, DB_NAME, DB_USER, DB_PASSWORD
-- helpdeskpro-frontend/.env.local    VITE_API_URL, VITE_COGNITO_AUTHORITY, VITE_COGNITO_CLIENT_ID,
-                                     VITE_COGNITO_REDIRECT_URI, VITE_COGNITO_DOMAIN, VITE_COGNITO_LOGOUT_URI
+## Primera vez
 
-Los scripts revisan que todo esté antes de arrancar y te dicen qué falta.
+1. Copia el archivo de ejemplo y completa los valores. Pide las credenciales al equipo:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Levanta todo:
+
+   ```bash
+   docker compose up --build --watch
+   ```
+
+3. Abre http://localhost:5173
+
+## Comandos habituales
+
+| Tarea | Comando |
+|---|---|
+| Levantar con actualización en vivo | `docker compose up --build --watch` |
+| Levantar en segundo plano | `docker compose up -d --build` |
+| Ver el estado | `docker compose ps -a` |
+| Ver los logs del backend | `docker compose logs -f backend` |
+| Detener y conservar los datos | `docker compose down` |
+| Borrar también los datos | `docker compose down -v` |
+| Ejecutar las pruebas del backend | `cd helpdeskpro-backend && ./mvnw test` |
+
+`db-init` debe aparecer como `Exited (0)`: es un servicio de un solo uso.
+
+## Gmail
+
+Por defecto, el backend no lee correos al arrancar. Para activarlo, cambia estas variables en `.env`:
+
+- `GOOGLE_GMAIL_HISTORICAL_SYNC_ENABLED=true`: sincroniza correos recientes al iniciar.
+- `GOOGLE_GMAIL_PUBSUB_ENABLED=true`: recibe correos nuevos.
+
+Después ejecuta `docker compose up -d`.
+
+## Seguridad
+
+- `.env` no se sube a git. `.env.example` solo lleva nombres, nunca valores.
+- Las variables `VITE_` llegan al navegador: nunca pongas secretos en ellas.
