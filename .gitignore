@@ -3,7 +3,14 @@ helpdeskpro-frontend/dist/
 
 helpdeskpro-backend/target/
 
+logs/
+logs/backend.log
+logs/frontend.log
+
+documentacion/
+
 .vscode/
+.github/
 .idea/
 
 *.iml
@@ -31,3 +38,8 @@ target/
 *.sw?
 .DS_Store
 Thumbs.db
+# Logs y PIDs generados por start-all.sh (cambian en cada ejecución)
+logs/
+
+# Ajustes locales de Compose: rutas y credenciales personales
+compose.override.yaml

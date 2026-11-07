@@ -1,0 +1,13 @@
+﻿id,dado,cuando,entonces,fuente,prioridad,categoria,por_confirmar,verificacion,revisado_en_commit
+HU01-CA-01,un cliente sin sesión,llama a una ruta protegida de lectura o escritura,el backend responde 401 y no ejecuta la acción,especificación funcional,Alta,seguridad,no,caso de prueba,
+HU01-CA-02,"un token alterado, malformado, vencido o que no es un access token de la aplicación",se usa para llamar a una ruta protegida,el backend responde 401 y no ejecuta la acción,especificación funcional,Alta,seguridad,no,caso de prueba,
+HU01-CA-03,un usuario con una sesión válida de Cognito,llama a una ruta protegida permitida para su rol,el backend responde 200,especificación funcional,Alta,seguridad,no,caso de prueba,
+HU01-CA-04,un usuario con credenciales válidas,inicia sesión desde la pantalla de bienvenida,Cognito lo autentica y FactSafe le permite entrar a la aplicación,especificación funcional,Alta,seguridad,no,caso de prueba,
+HU01-CA-05,la autenticación delegada a Cognito,se intenta registrar o iniciar sesión con las rutas propias del backend,esas rutas no están disponibles sin sesión y no se guardan contraseñas en la base de negocio,especificación funcional,Alta,seguridad,no,caso de prueba,
+HU01-CA-06,una sesión que expira mientras se usa la aplicación,el usuario realiza una acción protegida,la aplicación impide el acceso y lo lleva a iniciar sesión de nuevo,especificación funcional,Alta,seguridad,no,caso de prueba,
+HU01-CA-07,un usuario con la sesión iniciada,cierra sesión,vuelve a la pantalla de bienvenida y debe autenticarse de nuevo para entrar,especificación funcional,Alta,seguridad,no,caso de prueba,
+HU01-CA-08,un usuario autenticado sin rol de administrador,llama a una operación de administración,el backend responde 403 y no ejecuta la acción,backlog,Alta,seguridad,sí,caso de prueba,
+HU01-CA-09,un usuario autenticado,entra a la aplicación,"ve las secciones que corresponden a su rol, y la interfaz y el backend reconocen el mismo grupo de administrador",backlog,Alta,seguridad,sí,caso de prueba,
+HU01-CA-10,una persona sin autorización previa,intenta crear una cuenta desde el inicio de sesión,no obtiene acceso a los módulos protegidos,especificación funcional,Alta,seguridad,sí,caso de prueba,
+HU01-CA-11,credenciales incorrectas o Cognito no disponible,se intenta iniciar sesión,"se informa que no fue posible iniciar sesión, sin revelar información técnica interna",especificación funcional,Media,seguridad,no,caso de prueba,
+HU01-CA-12,el código de acceso del backend,se revisan sus rutas y clases,"no quedan controladores, rutas ni textos sin uso fuera del alcance del MVP",especificación funcional,Baja,funcionalidad,no,revisión de código,

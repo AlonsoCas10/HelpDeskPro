@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/facturas")
-@CrossOrigin(origins = "http://localhost:5173")
 public class FacturaSimuladaController {
 
     private final FacturaSimuladaService service;

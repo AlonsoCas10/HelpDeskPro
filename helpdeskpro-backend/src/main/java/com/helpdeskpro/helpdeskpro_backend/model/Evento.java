@@ -1,121 +1,154 @@
-
 package com.helpdeskpro.helpdeskpro_backend.model;
-//Importamos las herramientas de JPA
+
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "eventos")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Evento {
+
+    // =====================================================
+    // IDENTIFICADOR INTERNO DE HELPDESKPRO
+    // =====================================================
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Código interno del incidente: INC-001, INC-002...
+    @Column(name = "codigo", length = 50)
     private String codigo;
+
+
+    // =====================================================
+    // DATOS UTILIZADOS POR EL SISTEMA DE RIESGO
+    // =====================================================
+
+    @Column(name = "remitente", length = 320)
     private String remitente;
+
+    @Column(name = "dominioRegistrado", length = 255)
     private String dominioRegistrado;
+
+    @Column(name = "remitenteConocido")
     private Boolean remitenteConocido;
+
+    @Column(name = "destinatario", length = 320)
     private String destinatario;
+
+    @Column(name = "adjunto", length = 500)
     private String adjunto;
+
+    @Column(name = "asunto", length = 500)
     private String asunto;
+
+    @Column(name = "clasificacion", length = 100)
     private String clasificacion;
+
+    @Column(name = "riskScore")
     private Integer riskScore;
+
+    @Column(name = "estado", length = 100)
     private String estado;
-    private String fechaHora;
 
-    public String getCodigo() {
-        return codigo;
-    }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
+    // =====================================================
+    // DATOS PROVENIENTES DE GMAIL
+    // =====================================================
 
-    public Evento() {
-    }
+    /*
+     * El ID de Gmail NO será nuestra clave primaria.
+     *
+     * Nuestra PK sigue siendo "id" (Long).
+     *
+     * Este campo sirve para identificar el correo de Gmail
+     * y evitar guardar el mismo mensaje dos veces.
+     */
+    @Column(
+        name = "idGmailMessage",
+        unique = true,
+        length = 255
+    )
+    private String idGmailMessage;
 
-    public Long getId() {
-        return id;
-    }
+    @Column(name = "idGmailThread", length = 255)
+    private String idGmailThread;
 
-    public String getRemitente() {
-        return remitente;
-    }
+    @Column(name = "nombreRemitente", length = 150)
+    private String nombreRemitente;
 
-    public void setRemitente(String remitente) {
-        this.remitente = remitente;
-    }
+    @Column(name = "correoRemitente", length = 320)
+    private String correoRemitente;
 
-    public String getDestinatario() {
-        return destinatario;
-    }
+    @Column(name = "dominioRemitente", length = 255)
+    private String dominioRemitente;
 
-    public void setDestinatario(String destinatario) {
-        this.destinatario = destinatario;
-    }
 
-    public String getAdjunto() {
-        return adjunto;
-    }
+    // =====================================================
+    // FECHA DEL EVENTO
+    // =====================================================
 
-    public void setAdjunto(String adjunto) {
-        this.adjunto = adjunto;
-    }
+    @Column(name = "fechaHora")
+    private LocalDateTime fechaHora;
 
-    public String getAsunto() {
-        return asunto;
-    }
 
-    public void setAsunto(String asunto) {
-        this.asunto = asunto;
-    }
+    // =====================================================
+    // CONTENIDO DEL CORREO
+    // =====================================================
 
-    public String getClasificacion() {
-        return clasificacion;
-    }
+    @Lob
+    @Column(name = "contenidoTexto")
+    private String contenidoTexto;
 
-    public void setClasificacion(String clasificacion) {
-        this.clasificacion = clasificacion;
-    }
+    @Lob
+    @Column(name = "contenidoHTML")
+    private String contenidoHTML;
 
-    public Integer getRiskScore() {
-        return riskScore;
-    }
 
-    public void setRiskScore(Integer riskScore) {
-        this.riskScore = riskScore;
-    }
+    // =====================================================
+    // ESTADO DE LA CONEXIÓN CON GMAIL
+    // =====================================================
 
-    public String getEstado() {
-        return estado;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estadoConexion", length = 20)
+    private EstadoConexion estadoConexion;
 
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
 
-    public String getFechaHora() {
-        return fechaHora;
-    }
+    // =====================================================
+    // ENLACES ENCONTRADOS EN EL CORREO
+    // =====================================================
 
-    public void setFechaHora(String fechaHora) {
-        this.fechaHora = fechaHora;
-    }
+    @Builder.Default
+    @OneToMany(
+        mappedBy = "evento",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Enlace> enlaces = new ArrayList<>();
 
-    public String getDominioRegistrado() {
-        return dominioRegistrado;
-    }
 
-    public void setDominioRegistrado(String dominioRegistrado) {
-        this.dominioRegistrado = dominioRegistrado;
-    }
+    // =====================================================
+    // ARCHIVOS ADJUNTOS DEL CORREO
+    // =====================================================
 
-    public Boolean getRemitenteConocido() {
-        return remitenteConocido;
-    }
-
-    public void setRemitenteConocido(Boolean remitenteConocido) {
-        this.remitenteConocido = remitenteConocido;
-    }
-
+    @Builder.Default
+    @OneToMany(
+        mappedBy = "evento",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Archivo> archivos = new ArrayList<>();
 }

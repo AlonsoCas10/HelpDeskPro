@@ -1,0 +1,101 @@
+name: helpdeskpro-db
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: helpdeskpro-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"          # edición gratuita, completa, solo para desarrollo/pruebas
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}   # Docker Compose lee esto de ".env" automáticamente
+    ports:
+      - "1433:1433"                   # mismo puerto que espera tu application.properties
+    volumes:
+      - sqlserver_data:/var/opt/mssql # persiste la base entre reinicios del contenedor
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -b -Q 'SELECT 1' -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    entrypoint: ["/opt/mssql-tools18/bin/sqlcmd"]
+    command: ["-S", "sqlserver", "-U", "sa", "-C", "-b", "-i", "/init/init.sql"]
+    environment:
+      SQLCMDPASSWORD: ${MSSQL_SA_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./helpdeskpro-db/init/init.sql:/init/init.sql:ro
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  backend:
+    build: ./helpdeskpro-backend
+    image: factsafe-backend:dev
+    environment:
+      JAVA_TOOL_OPTIONS: -Djava.net.preferIPv4Stack=true
+      DB_HOST: sqlserver
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      COGNITO_JWK_SET_URI: ${COGNITO_JWK_SET_URI}
+      COGNITO_ISSUER_URI: ${COGNITO_ISSUER_URI}
+      COGNITO_CLIENT_ID: ${COGNITO_CLIENT_ID}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REFRESH_TOKEN: ${GOOGLE_REFRESH_TOKEN:-}
+      GOOGLE_GMAIL_APPLICATION_NAME: ${GOOGLE_GMAIL_APPLICATION_NAME:-HelpDeskPro Gmail Connection Test}
+      GOOGLE_GMAIL_SCOPE: ${GOOGLE_GMAIL_SCOPE:-https://www.googleapis.com/auth/gmail.readonly}
+      GOOGLE_GMAIL_EXPECTED_EMAIL: ${GOOGLE_GMAIL_EXPECTED_EMAIL:-}
+      GOOGLE_GMAIL_PUBSUB_ENABLED: ${GOOGLE_GMAIL_PUBSUB_ENABLED:-false}
+      GOOGLE_GMAIL_PUBSUB_TOPIC: ${GOOGLE_GMAIL_PUBSUB_TOPIC:-}
+      GOOGLE_GMAIL_PUBSUB_SUBSCRIPTION: ${GOOGLE_GMAIL_PUBSUB_SUBSCRIPTION:-}
+      GOOGLE_GMAIL_WATCH_RENEWAL_MS: ${GOOGLE_GMAIL_WATCH_RENEWAL_MS:-432000000}
+      GOOGLE_GMAIL_HISTORICAL_SYNC_ENABLED: ${GOOGLE_GMAIL_HISTORICAL_SYNC_ENABLED:-false}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: rebuild
+          path: ./helpdeskpro-backend/src
+        - action: rebuild
+          path: ./helpdeskpro-backend/pom.xml
+
+
+  frontend:
+    build: ./helpdeskpro-frontend
+    image: factsafe-frontend:dev
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
+      VITE_COGNITO_AUTHORITY: ${VITE_COGNITO_AUTHORITY}
+      VITE_COGNITO_CLIENT_ID: ${VITE_COGNITO_CLIENT_ID}
+      VITE_COGNITO_DOMAIN: ${VITE_COGNITO_DOMAIN}
+      VITE_COGNITO_REDIRECT_URI: ${VITE_COGNITO_REDIRECT_URI}
+      VITE_COGNITO_LOGOUT_URI: ${VITE_COGNITO_LOGOUT_URI}
+
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    develop:
+      watch:
+        - action: sync
+          path: ./helpdeskpro-frontend/src
+          target: /app/src
+        - action: rebuild
+          path: ./helpdeskpro-frontend/package-lock.json
+
+
+volumes:
+  sqlserver_data:

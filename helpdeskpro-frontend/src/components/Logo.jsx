@@ -1,6 +1,6 @@
 import logo from '../assets/logo.png'
 
-function Logo(props) {
+function Logo() {
 
   return (
     <div className="logo-container">

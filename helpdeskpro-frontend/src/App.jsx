@@ -1,11 +1,68 @@
-import Login from './components/Login'
+import { useEffect } from 'react'
+import { useAuth } from 'react-oidc-context'
+import './App.css'
+import { setAccessToken } from './api/apiClient'
+import Dashboard from './components/Dashboard'
+import Logo from './components/Logo'
+
+const logoutUri = import.meta.env.VITE_COGNITO_LOGOUT_URI
+const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID
+const cognitoDomain = import.meta.env.VITE_COGNITO_DOMAIN
 
 function App() {
+  const auth = useAuth()
+
+  useEffect(() => {
+    setAccessToken(auth.isAuthenticated ? auth.user?.access_token : null)
+  }, [auth.isAuthenticated, auth.user?.access_token])
+
+  const profile = auth.user?.profile ?? {}
+  const grupos = profile['cognito:groups'] ?? []
+  const esAdministrador = Array.isArray(grupos) && grupos.includes('Administrador')
+  const usuario = {
+    nombre: profile.name ?? profile.preferred_username ?? profile.email ?? profile.sub ?? 'Usuario',
+    correo: profile.email ?? profile.preferred_username ?? 'Correo no disponible',
+  }
+
+  async function cerrarSesion() {
+    await auth.removeUser()
+
+    const logoutUrl = new URL(`${cognitoDomain}/logout`)
+    logoutUrl.searchParams.set('client_id', clientId)
+    logoutUrl.searchParams.set('logout_uri', logoutUri)
+    window.location.assign(logoutUrl.toString())
+  }
+
+  if (auth.isLoading) {
+    return <p>Cargando sesión...</p>
+  }
+
+  if (auth.error) {
+    return <p>No se pudo iniciar sesión: {auth.error.message}</p>
+  }
+
+  if (auth.isAuthenticated) {
+    return (
+      <Dashboard
+        usuario={usuario}
+        cerrarSesion={cerrarSesion}
+        esAdministrador={esAdministrador}
+      />
+    )
+  }
 
   return (
-    <Login />
+    <div className="login-page">
+      <div className="login-container">
+        <Logo />
+        <h1>FactSafe</h1>
+        <p className="subtitle">“No solo detectamos amenazas, las interpretamos antes de que afecten a tu negocio.”</p>
+        <button type="button" onClick={() => auth.signinRedirect()}>
+          Iniciar sesión o registrarse
+        </button>
+      </div>
+    </div>
   )
-
 }
 
 export default App

@@ -1,8 +1,6 @@
 package com.helpdeskpro.helpdeskpro_backend.model;
 
-
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
