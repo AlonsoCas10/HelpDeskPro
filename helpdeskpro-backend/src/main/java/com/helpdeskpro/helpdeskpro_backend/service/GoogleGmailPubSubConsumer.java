@@ -153,6 +153,7 @@ public class GoogleGmailPubSubConsumer {
 
             List<GoogleGmailMessageParser.ParsedGmailMessage> messages = gmailService
                     .readMessagesFromNotification(notification.getEmailAddress(), historyId);
+            logger.info("Notificación de Gmail procesada: historyId={}, mensajes={}.", historyId, messages.size());
             messages.forEach(parsedMessage -> {
                 eventPersistenceService.persist(parsedMessage);
                 logMessage(parsedMessage);

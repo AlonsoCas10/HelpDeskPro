@@ -36,10 +36,10 @@ Solo necesitas Docker con Compose.
 
 ## Gmail
 
-Por defecto, el backend no lee correos al arrancar. Para activarlo, cambia estas variables en `.env`:
+Por defecto, el backend no lee correos. Para activarlo, cambia estas variables en `.env`:
 
-- `GOOGLE_GMAIL_HISTORICAL_SYNC_ENABLED=true`: sincroniza correos recientes al iniciar.
-- `GOOGLE_GMAIL_PUBSUB_ENABLED=true`: recibe correos nuevos.
+- `GOOGLE_GMAIL_HISTORICAL_SYNC_ENABLED=true`: revisa la bandeja de entrada al iniciar y cada 30 segundos. Recupera los correos aunque se pierda una notificación.
+- `GOOGLE_GMAIL_PUBSUB_ENABLED=true`: recibe avisos de correos nuevos para mostrarlos antes. Requiere credenciales de `gcloud` en un `compose.override.yaml` local.
 
 Después ejecuta `docker compose up -d`.
 

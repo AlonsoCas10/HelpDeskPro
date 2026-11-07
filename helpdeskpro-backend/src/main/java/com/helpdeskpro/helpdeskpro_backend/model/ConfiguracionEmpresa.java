@@ -1,5 +1,6 @@
 package com.helpdeskpro.helpdeskpro_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -39,12 +40,15 @@ public class ConfiguracionEmpresa {
     // RELACIONES
     // ==========================================
 
+    @JsonIgnore
     @OneToMany(mappedBy = "configuracionEmpresa")
     private List<Cliente> clientes = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "configuracionEmpresa")
     private List<Deudor> deudores = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "configuracionEmpresa")
     private List<UsuarioCritico> usuariosCriticos = new ArrayList<>();
 

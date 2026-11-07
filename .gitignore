@@ -40,3 +40,6 @@ target/
 Thumbs.db
 # Logs y PIDs generados por start-all.sh (cambian en cada ejecución)
 logs/
+
+# Ajustes locales de Compose: rutas y credenciales personales
+compose.override.yaml

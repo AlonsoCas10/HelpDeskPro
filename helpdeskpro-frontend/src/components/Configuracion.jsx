@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import '../App.css'
 import apiClient from '../api/apiClient'
 import * as XLSX from 'xlsx'
+import DatosCargados from './DatosCargados'
 
 function Configuracion({ esAdministrador = false }) {
 
@@ -687,6 +688,19 @@ function Configuracion({ esAdministrador = false }) {
             >
               Usuarios y Roles
             </button>
+
+            <button
+              className={
+                seccion === "datos"
+                  ? "tab-activa"
+                  : ""
+              }
+              onClick={() =>
+                setSeccion("datos")
+              }
+            >
+              Datos cargados
+            </button>
           </>
         )}
 
@@ -995,6 +1009,18 @@ function Configuracion({ esAdministrador = false }) {
               </div>
 
             </div>
+
+          )}
+
+
+        {/* ====================================
+            DATOS CARGADOS
+        ===================================== */}
+
+        {esAdministrador &&
+          seccion === "datos" && (
+
+            <DatosCargados />
 
           )}
 

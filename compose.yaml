@@ -39,6 +39,7 @@ services:
     build: ./helpdeskpro-backend
     image: factsafe-backend:dev
     environment:
+      JAVA_TOOL_OPTIONS: -Djava.net.preferIPv4Stack=true
       DB_HOST: sqlserver
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
