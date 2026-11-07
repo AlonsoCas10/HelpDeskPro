@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/clientes")
-@CrossOrigin(origins = "http://localhost:5173")
 public class ExcelClienteVipController {
 
     private final ExcelClienteVipService service;

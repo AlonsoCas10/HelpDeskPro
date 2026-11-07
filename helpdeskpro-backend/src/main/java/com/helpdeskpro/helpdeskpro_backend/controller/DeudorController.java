@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/deudores")
-@CrossOrigin(origins = "http://localhost:5173")
 public class DeudorController {
 
     private final DeudorService service;

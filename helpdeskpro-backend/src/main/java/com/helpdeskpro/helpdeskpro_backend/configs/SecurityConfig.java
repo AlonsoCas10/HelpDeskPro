@@ -44,10 +44,13 @@ public class SecurityConfig {
     @Value("${COGNITO_CLIENT_ID}")
     private String clientId;
 
-    @Bean 
+    @Value("${app.cors.allowed-origins}")
+    private String[] allowedOrigins;
+
+    @Bean
     public CorsConfigurationSource cors(){
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
 
@@ -121,9 +124,11 @@ public class SecurityConfig {
             .exceptionHandling(c->c.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .sessionManagement(c->c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(autorize->
-                autorize.requestMatchers("/", "/error", "/usuarios/login", "/usuarios/registro").permitAll()
+                autorize.requestMatchers("/", "/error").permitAll()
 
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // La autenticación se delega a Cognito: estas rutas no deben usarse.
+                .requestMatchers("/usuarios/login", "/usuarios/registro").denyAll()
                 .requestMatchers(
                     HttpMethod.POST,
                     "/integraciones/gmail/import-recent"
