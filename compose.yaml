@@ -53,6 +53,30 @@ services:
       db-init:
         condition: service_completed_successfully
     restart: unless-stopped
+    develop:
+      watch:
+        - action: rebuild
+          path: ./helpdeskpro-backend/src
+        - action: rebuild
+          path: ./helpdeskpro-backend/pom.xml
+
+
+  frontend:
+    build: ./helpdeskpro-frontend
+    image: factsafe-frontend:dev
+    env_file:
+      - ./helpdeskpro-frontend/.env.local
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    develop:
+      watch:
+        - action: sync
+          path: ./helpdeskpro-frontend/src
+          target: /app/src
+        - action: rebuild
+          path: ./helpdeskpro-frontend/package-lock.json
 
 
 volumes:
