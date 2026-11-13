@@ -24,13 +24,12 @@ public class EventoService {
 
     public Evento guardarEvento(Evento evento) {
 
-        // Si el remitente está vacío, utilizamos el correo
-        // obtenido mediante la integración con Gmail.
-        if ((evento.getRemitente() == null
-                || evento.getRemitente().isBlank())
-                && evento.getCorreoRemitente() != null) {
+        if (evento.getEnlaces() != null) {
+            evento.getEnlaces().forEach(enlace -> enlace.setEvento(evento));
+        }
 
-            evento.setRemitente(evento.getCorreoRemitente());
+        if (evento.getArchivos() != null) {
+            evento.getArchivos().forEach(archivo -> archivo.setEvento(evento));
         }
 
         // =================================================

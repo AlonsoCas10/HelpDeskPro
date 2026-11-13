@@ -150,52 +150,6 @@ public class GoogleGmailEventPersistenceService {
 
 
         // =================================================
-        // CAMPOS UTILIZADOS POR EL SISTEMA DE RIESGO
-        // =================================================
-
-        /*
-         * Tu sistema anterior utilizaba "remitente".
-         *
-         * Para un correo obtenido desde Gmail,
-         * utilizamos el correo del remitente.
-         */
-
-        evento.setRemitente(
-            blankToNull(
-                message.senderAddress()
-            )
-        );
-
-
-        /*
-         * En esta etapa no tenemos todavía una consulta
-         * al catálogo de remitentes conocidos.
-         *
-         * Por seguridad, dejamos el valor como false.
-         *
-         * Posteriormente puede reemplazarse por una consulta
-         * a clientes, usuarios críticos o remitentes confiables.
-         */
-
-        evento.setRemitenteConocido(
-            false
-        );
-
-
-        /*
-         * El dominio registrado de la empresa se resolverá
-         * posteriormente desde la configuración de la empresa.
-         *
-         * Por ahora dejamos este campo vacío para no asumir
-         * un dominio incorrecto.
-         */
-
-        evento.setDominioRegistrado(
-            null
-        );
-
-
-        // =================================================
         // INFORMACIÓN DEL CORREO
         // =================================================
 

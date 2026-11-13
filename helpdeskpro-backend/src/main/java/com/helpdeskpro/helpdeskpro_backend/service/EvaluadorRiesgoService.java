@@ -60,11 +60,7 @@ public class EvaluadorRiesgoService {
 
         int puntos = 0;
 
-        String correo = normalizarCorreo(evento.getRemitente());
-
-        if (correo == null) {
-            correo = normalizarCorreo(evento.getCorreoRemitente());
-        }
+        String correo = normalizarCorreo(evento.getCorreoRemitente());
 
         if (correo == null) {
             return 20;
@@ -114,21 +110,6 @@ public class EvaluadorRiesgoService {
 
         if (!remitenteAutorizado) {
             puntos += 12;
-        }
-
-        // Si el remitente está marcado explícitamente como desconocido.
-        if (Boolean.FALSE.equals(evento.getRemitenteConocido())) {
-            puntos += 4;
-        }
-
-        // Si se dispone de un dominio registrado, comparar ambos dominios.
-        String dominioRegistrado = evento.getDominioRegistrado();
-
-        if (dominioRegistrado != null
-                && !dominioRegistrado.isBlank()
-                && !dominio.equalsIgnoreCase(dominioRegistrado.trim())) {
-
-            puntos += 4;
         }
 
         return Math.min(puntos, 20);
@@ -284,11 +265,7 @@ public class EvaluadorRiesgoService {
 
         int puntos = 0;
 
-        String correo = normalizarCorreo(evento.getRemitente());
-
-        if (correo == null) {
-            correo = normalizarCorreo(evento.getCorreoRemitente());
-        }
+        String correo = normalizarCorreo(evento.getCorreoRemitente());
 
         if (correo == null) {
             return 25;

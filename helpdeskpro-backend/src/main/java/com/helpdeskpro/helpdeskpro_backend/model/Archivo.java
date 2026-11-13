@@ -1,6 +1,7 @@
 package com.helpdeskpro.helpdeskpro_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,11 +18,12 @@ public class Archivo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JsonIgnore
     @JoinColumn(
         name = "idEvento",
-        nullable = false
+        nullable = false,
+        referencedColumnName = "id"
     )
     private Evento evento;
 
