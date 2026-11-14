@@ -8,12 +8,11 @@ function Eventos() {
   const [eventos, setEventos] = useState([])
   const [busqueda, setBusqueda] = useState("")
 
-  const [remitente, setRemitente] = useState("")
+  const [correoRemitente, setCorreoRemitente] = useState("")
   const [destinatario, setDestinatario] = useState("")
-  const [adjunto, setAdjunto] = useState("")
+  const [archivos, setArchivos] = useState([])
   const [asunto, setAsunto] = useState("")
   const [clasificacion, setClasificacion] = useState("")
-  const [estado, setEstado] = useState("")
   const [fechaHora, setFechaHora] = useState("")
 
   // Controla si mostramos la lista o el detalle
@@ -28,8 +27,6 @@ function Eventos() {
   
   const [resultado, setResultado] = useState("")
   const [resultadoGuardado, setResultadoGuardado] = useState("")
-
-  const [dominioRegistrado, setDominioRegistrado] = useState("")
 
   
 
@@ -96,13 +93,11 @@ function Eventos() {
 
       const nuevoEvento = {
 
-        remitente: remitente,
-        dominioRegistrado: dominioRegistrado,
+        correoRemitente: correoRemitente,
         destinatario: destinatario,
-        adjunto: adjunto,
+        archivos: archivos,
         asunto: asunto,
         clasificacion: clasificacion,
-        estado: estado,
         fechaHora: fechaHora
 
       }
@@ -125,13 +120,11 @@ function Eventos() {
 
       // Limpiar formulario
 
-      setRemitente("")
-      setDominioRegistrado("")
+      setCorreoRemitente("")
       setDestinatario("")
-      setAdjunto("")
+      setArchivos([])
       setAsunto("")
       setClasificacion("")
-      setEstado("")
       setFechaHora("")
 
 
@@ -160,13 +153,15 @@ function Eventos() {
 
       evento.codigo?.toLowerCase().includes(texto) ||
 
-      evento.remitente?.toLowerCase().includes(texto) ||
+      evento.correoRemitente?.toLowerCase().includes(texto) ||
 
       evento.destinatario?.toLowerCase().includes(texto) ||
 
       evento.asunto?.toLowerCase().includes(texto) ||
 
-      evento.adjunto?.toLowerCase().includes(texto)
+      evento.archivos?.some((archivo) =>
+        archivo.nombre?.toLowerCase().includes(texto)
+      )
 
     )
 
@@ -262,29 +257,11 @@ function Eventos() {
                   <input
                     type="email"
                     placeholder="ejemplo@empresa.com"
-                    value={remitente}
-                    onChange={(e) => setRemitente(e.target.value)}
+                    value={correoRemitente}
+                    onChange={(e) => setCorreoRemitente(e.target.value)}
                   />
 
                 </div>
-
-                {/* DOMINIO REGISTRADO */}
-
-                <div className="campo-evento">
-
-                  <label>
-                    Dominio registrado
-                  </label>
-
-                  <input
-                    type="text"
-                    placeholder="empresa.com"
-                    value={dominioRegistrado}
-                    onChange={(e) => setDominioRegistrado(e.target.value)}
-                  />
-
-                </div>
-
 
                 {/* DESTINATARIO */}
 
@@ -319,9 +296,15 @@ function Eventos() {
 
                       if (e.target.files.length > 0) {
 
-                        setAdjunto(
-                          e.target.files[0].name
-                        )
+                        const archivo = e.target.files[0]
+                        const extension = archivo.name.includes(".")
+                          ? archivo.name.split(".").pop()
+                          : ""
+                        setArchivos([{
+                          nombre: archivo.name,
+                          tipo: archivo.type,
+                          extension
+                        }])
 
                       }
 
@@ -381,40 +364,6 @@ function Eventos() {
                   </select>
 
                 </div>
-
-                {/* ESTADO */}
-
-                <div className="campo-evento">
-
-                  <label>
-                    Estado
-                  </label>
-
-                  <select
-                    value={estado}
-                    onChange={(e) => setEstado(e.target.value)}
-                  >
-
-                    <option value="">
-                      Seleccionar estado
-                    </option>
-
-                    <option value="Procesado">
-                      Procesado
-                    </option>
-
-                    <option value="Revisar">
-                      Revisar
-                    </option>
-
-                    <option value="Bloqueado">
-                      Bloqueado
-                    </option>
-
-                  </select>
-
-                </div>
-
 
                 {/* FECHA Y HORA */}
 
@@ -489,9 +438,7 @@ function Eventos() {
                     Identificación
                   </th>
 
-                  <th>
-                    Remitente
-                  </th>
+                  <th>Remitente</th>
 
                   <th>
                     Destinatario
@@ -511,10 +458,6 @@ function Eventos() {
 
                   <th>
                     Risk Score
-                  </th>
-
-                  <th>
-                    Estado
                   </th>
 
                   <th>
@@ -545,7 +488,7 @@ function Eventos() {
 
 
                     <td>
-                      {evento.remitente}
+                      {evento.correoRemitente}
                     </td>
 
 
@@ -555,7 +498,7 @@ function Eventos() {
 
 
                     <td>
-                      {evento.adjunto}
+                      {evento.archivos?.map((archivo) => archivo.nombre).join(", ")}
                     </td>
 
 
@@ -573,10 +516,6 @@ function Eventos() {
                       {evento.riskScore}
                     </td>
 
-
-                    <td>
-                      {evento.estado}
-                    </td>
 
 
                     <td>
@@ -737,7 +676,7 @@ function Eventos() {
 
               <p>
                 <strong>Remitente:</strong>
-                {eventoSeleccionado.remitente || "No disponible"}
+                {eventoSeleccionado.correoRemitente || "No disponible"}
               </p>
 
               <p>
@@ -763,20 +702,12 @@ function Eventos() {
               </p>
 
               <p>
-                <strong>Estado:</strong>
-                {eventoSeleccionado.estado || "No disponible"}
-              </p>
-
-              <p>
                 <strong>Adjunto:</strong>
-                {eventoSeleccionado.adjunto ||
-                  (eventoSeleccionado.archivos?.length > 0
-                    ? eventoSeleccionado.archivos
-                        .map((archivo) =>
-                          archivo.nombre || archivo.nombreArchivo || "Archivo adjunto"
-                        )
-                        .join(", ")
-                    : "Sin adjuntos")}
+                {eventoSeleccionado.archivos?.length > 0
+                  ? eventoSeleccionado.archivos
+                      .map((archivo) => archivo.nombre || "Archivo adjunto")
+                      .join(", ")
+                  : "Sin adjuntos"}
               </p>
 
             </div>
