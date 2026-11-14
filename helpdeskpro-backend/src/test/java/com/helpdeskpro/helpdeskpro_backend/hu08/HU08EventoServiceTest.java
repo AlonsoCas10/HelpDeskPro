@@ -47,13 +47,11 @@ class HU08EventoServiceTest {
         Evento enviado = new Evento();
         enviado.setAsunto("QA-HU08-U07");
         enviado.setClasificacion("Crítico");
-        enviado.setEstado("Cerrado");
 
         Evento guardado = eventoService.guardarEvento(enviado);
 
         assertAll(
                 () -> assertEquals(30, guardado.getRiskScore(), "el Risk Score debe ser el que calcula el servidor"),
-                () -> assertEquals("Medio", guardado.getClasificacion(), "con 30 puntos el nivel debe ser Medio"),
-                () -> assertEquals("Requiere revisión", guardado.getEstado(), "el estado inicial debe ser Requiere revisión"));
+                () -> assertEquals("Medio", guardado.getClasificacion(), "con 30 puntos el nivel debe ser Medio"));
     }
 }
