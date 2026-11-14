@@ -1,0 +1,12 @@
+﻿id,titulo,criterio_aceptacion,correo_prueba,pasos,esperado,prioridad,resultado,fecha,hallazgo,version_probada,quien
+HU08-CP-U-01,Evento de bajo riesgo da puntaje bajo,HU08-CA-01,ninguno,"1. Evaluar un evento de un remitente registrado, sin enlaces ni adjuntos ni contenido de riesgo.",El Risk Score es bajo (menor a 25),Alta,pendiente,,,,Judith
+HU08-CP-U-02,Remitente no autorizado suma puntos,HU08-CA-03,ninguno,1. Evaluar un evento cuyo remitente no es cliente ni deudor.,El factor de remitente suma 12 puntos,Media,pendiente,,,,Judith
+HU08-CP-U-03,Adjunto ejecutable suma puntos,HU08-CA-04,ninguno,1. Evaluar un evento con un adjunto .exe.,El factor de enlaces y archivos suma 10 puntos,Media,pendiente,,,,Judith
+HU08-CP-U-04,Contenido con credenciales suma puntos,HU08-CA-05,ninguno,1. Evaluar un evento cuyo asunto o cuerpo pide credenciales.,El factor de contenido suma 7 puntos,Media,pendiente,,,,Judith
+HU08-CP-U-05,El Risk Score se limita a 100,HU08-CA-02,ninguno,1. Evaluar un evento que combina todos los factores al máximo.,"El Risk Score es 100, no más",Media,pendiente,,,,Judith
+HU08-CP-U-06,Remitente ausente no rompe el cálculo,HU08-CA-08,ninguno,1. Evaluar un evento sin remitente ni correo de remitente.,El evaluador devuelve 45 sin lanzar errores,Media,pendiente,,,,Judith
+HU08-CP-U-07,El nivel se deriva del puntaje,HU08-CA-09,ninguno,1. Guardar un evento cuyo Risk Score es 30.,El nivel del evento guardado es Medio,Alta,pendiente,,,,Judith
+HU08-CP-U-08,El estado inicial se deriva del nivel,HU08-CA-10,ninguno,1. Guardar un evento de nivel Medio o superior.,El estado inicial del evento es Requiere revisión,Alta,pendiente,,,,Judith
+HU08-CP-A-01,El servidor fija el nivel y el estado,HU08-CA-11,ninguno,1. POST /eventos con clasificacion Crítico y estado Cerrado y un contenido de bajo riesgo.,El servidor recalcula el nivel y el estado y no guarda los que envió el cliente,Alta,pendiente,,,,Judith
+HU08-CP-A-02,El listado muestra el Risk Score y el nivel,HU08-CA-12,ninguno,1. GET /eventos.,Cada evento muestra su Risk Score y su nivel,Alta,pendiente,,,,Judith
+HU08-CP-N-01,Ver el nivel del evento en el dashboard,HU08-CA-12,ninguno,1. Abrir el dashboard y ver un evento.,El evento muestra su nivel calculado,Baja,pendiente,,,,Judith

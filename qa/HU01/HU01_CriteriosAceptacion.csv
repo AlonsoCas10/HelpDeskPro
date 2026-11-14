@@ -10,4 +10,4 @@ HU01-CA-08,un usuario autenticado sin rol de administrador,llama a una operació
 HU01-CA-09,un usuario autenticado,entra a la aplicación,"ve las secciones que corresponden a su rol, y la interfaz y el backend reconocen el mismo grupo de administrador",backlog,Alta,seguridad,sí,caso de prueba,
 HU01-CA-10,una persona sin autorización previa,intenta crear una cuenta desde el inicio de sesión,no obtiene acceso a los módulos protegidos,especificación funcional,Alta,seguridad,sí,caso de prueba,
 HU01-CA-11,credenciales incorrectas o Cognito no disponible,se intenta iniciar sesión,"se informa que no fue posible iniciar sesión, sin revelar información técnica interna",especificación funcional,Media,seguridad,no,caso de prueba,
-HU01-CA-12,el código de acceso del backend,se revisan sus rutas y clases,"no quedan controladores, rutas ni textos sin uso fuera del alcance del MVP",especificación funcional,Baja,funcionalidad,no,revisión de código,
+HU01-CA-12,el código de acceso del backend,se revisan sus rutas y clases,"no quedan controladores, rutas ni textos sin uso fuera del alcance del MVP",especificación funcional,Baja,funcionalidad,no,revisión de código,7c13498

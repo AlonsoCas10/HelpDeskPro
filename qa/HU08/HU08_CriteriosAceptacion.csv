@@ -1,0 +1,15 @@
+﻿id,dado,cuando,entonces,fuente,prioridad,categoria,por_confirmar,verificacion,revisado_en_commit
+HU08-CA-01,un evento de correo,se guarda,el Risk Score se calcula sumando los cinco factores de riesgo y queda entre 0 y 100,especificacion funcional,Alta,funcionalidad,no,unitaria,f3d0e84
+HU08-CA-02,la suma de los cinco factores,supera los 100 puntos,el Risk Score se limita a 100,especificacion funcional,Media,fiabilidad,no,unitaria,f3d0e84
+HU08-CA-03,un remitente no registrado como cliente ni deudor,se evalúa el riesgo,"el factor de remitente suma puntos, hasta un máximo de 20",especificacion funcional,Media,funcionalidad,no,unitaria,f3d0e84
+HU08-CA-04,enlaces con IP o acortadores y adjuntos ejecutables,se evalúa el riesgo,"el factor de enlaces y archivos suma puntos, hasta un máximo de 20",especificacion funcional,Media,funcionalidad,no,unitaria,f3d0e84
+HU08-CA-05,"contenido con solicitudes de transferencia, cambio de cuenta, urgencia o credenciales",se evalúa el riesgo,"el factor de contenido suma puntos, hasta un máximo de 20",especificacion funcional,Media,funcionalidad,no,unitaria,f3d0e84
+HU08-CA-06,un remitente que no pertenece a ningún cliente ni deudor del contexto,se evalúa el riesgo,"el factor de contexto factoring suma puntos, hasta un máximo de 25",especificacion funcional,Media,funcionalidad,no,unitaria,f3d0e84
+HU08-CA-07,un destinatario que es un usuario crítico,se evalúa el riesgo,el factor de criticidad suma 15 puntos,especificacion funcional,Media,funcionalidad,no,unitaria,f3d0e84
+HU08-CA-08,un evento con el remitente ausente,se evalúa el riesgo,el cálculo no se rompe y aplica el máximo del factor,especificacion funcional,Media,fiabilidad,no,unitaria,f3d0e84
+HU08-CA-09,el Risk Score calculado,se guarda el evento,"el nivel (Bajo, Medio, Alto o Crítico) se deriva del puntaje según los umbrales",especificacion funcional,Alta,funcionalidad,no,unitaria,f3d0e84
+HU08-CA-10,el nivel del evento,se guarda el evento,el estado inicial se deriva del nivel (desde Medio queda Requiere revisión),especificacion funcional,Alta,funcionalidad,no,revision de codigo,f3d0e84
+HU08-CA-11,la creación de un evento,llega por la API,"el Risk Score, el nivel y el estado los calcula el servidor y no los fija el cliente",acuerdos,Alta,seguridad,no,caso de prueba,
+HU08-CA-12,un evento guardado,se consulta el listado,el Risk Score y el nivel quedan disponibles para revisar y priorizar,especificacion funcional,Alta,funcionalidad,no,caso de prueba,
+HU08-CA-13,los pesos de cada factor de riesgo,se evalúa el Risk Score,coinciden con los definidos en la especificación del MVP,especificacion funcional,Alta,funcionalidad,si,revision de codigo,f3d0e84
+HU08-CA-14,secretos del backend como la contraseña de la base de datos,se versiona el código en el repositorio público,los secretos no se guardan en archivos versionados y se leen de variables de entorno fuera de git,acuerdos,Alta,seguridad,no,revision de codigo,f3d0e84

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "eventos")
+@Table(name = "evento")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -37,20 +37,8 @@ public class Evento {
     // DATOS UTILIZADOS POR EL SISTEMA DE RIESGO
     // =====================================================
 
-    @Column(name = "remitente", length = 320)
-    private String remitente;
-
-    @Column(name = "dominioRegistrado", length = 255)
-    private String dominioRegistrado;
-
-    @Column(name = "remitenteConocido")
-    private Boolean remitenteConocido;
-
     @Column(name = "destinatario", length = 320)
     private String destinatario;
-
-    @Column(name = "adjunto", length = 500)
-    private String adjunto;
 
     @Column(name = "asunto", length = 500)
     private String asunto;
@@ -60,9 +48,6 @@ public class Evento {
 
     @Column(name = "riskScore")
     private Integer riskScore;
-
-    @Column(name = "estado", length = 100)
-    private String estado;
 
 
     // =====================================================
@@ -77,11 +62,7 @@ public class Evento {
      * Este campo sirve para identificar el correo de Gmail
      * y evitar guardar el mismo mensaje dos veces.
      */
-    @Column(
-        name = "idGmailMessage",
-        unique = true,
-        length = 255
-    )
+    @Column(name = "idGmailMessage", unique = true, length = 255 )
     private String idGmailMessage;
 
     @Column(name = "idGmailThread", length = 255)

@@ -40,20 +40,17 @@ class EvaluadorRiesgoServiceTest {
     private EvaluadorRiesgoService evaluador;
 
     // =====================================================
-    // CASO 1: DOMINIO DIFERENTE AL REGISTRADO
+    // CASO 1: REMITENTE AUTORIZADO
     // =====================================================
 
     @Test
-    void dominioDistinto_sumaCuatroPuntos() {
+    void remitenteAutorizado_noSumaPuntos() {
 
         Evento evento = new Evento();
 
-        evento.setRemitente("atacante@dominio-falso.com");
-        evento.setDominioRegistrado("empresa.com");
-        evento.setRemitenteConocido(true);
+        evento.setCorreoRemitente("atacante@dominio-falso.com");
 
-        // Simulamos que el correo sí está registrado.
-        // Así aislamos la diferencia entre dominios.
+        // Simulamos que el correo está autorizado.
         when(clienteRepository.findByCorreoAutorizadoIgnoreCase(
                 "atacante@dominio-falso.com"))
                 .thenReturn(Optional.of(Mockito.mock(Cliente.class)));
@@ -64,21 +61,19 @@ class EvaluadorRiesgoServiceTest {
 
         int puntos = evaluador.evaluarRiesgo(evento);
 
-        assertEquals(4, puntos);
+        assertEquals(0, puntos);
     }
 
     // =====================================================
-    // CASO 2: REMITENTE NO CONOCIDO
+    // CASO 2: REMITENTE AUTORIZADO ALTERNATIVO
     // =====================================================
 
     @Test
-    void remitenteNoConocido_sumaCuatroPuntos() {
+    void remitenteAutorizadoAlternativo_noSumaPuntos() {
 
         Evento evento = new Evento();
 
-        evento.setRemitente("sheldon.schur@manpowergroup.vp.com");
-        evento.setDominioRegistrado("manpowergroup.vp.com");
-        evento.setRemitenteConocido(false);
+        evento.setCorreoRemitente("sheldon.schur@manpowergroup.vp.com");
 
         // Simulamos que el correo está autorizado.
         when(clienteRepository.findByCorreoAutorizadoIgnoreCase(
@@ -91,7 +86,7 @@ class EvaluadorRiesgoServiceTest {
 
         int puntos = evaluador.evaluarRiesgo(evento);
 
-        assertEquals(4, puntos);
+        assertEquals(0, puntos);
     }
 
     // =====================================================
@@ -103,9 +98,7 @@ class EvaluadorRiesgoServiceTest {
 
         Evento evento = new Evento();
 
-        evento.setRemitente("");
-        evento.setDominioRegistrado("manpowergroup.vp.com");
-        evento.setRemitenteConocido(true);
+        evento.setCorreoRemitente("");
 
         int puntos = evaluador.evaluarRiesgo(evento);
 
@@ -123,9 +116,7 @@ class EvaluadorRiesgoServiceTest {
 
         Evento evento = new Evento();
 
-        evento.setRemitente(null);
-        evento.setDominioRegistrado("manpowergroup.vp.com");
-        evento.setRemitenteConocido(true);
+        evento.setCorreoRemitente(null);
 
         int puntos = evaluador.evaluarRiesgo(evento);
 

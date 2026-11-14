@@ -43,13 +43,17 @@ Solo necesitas Docker con Compose. Para iniciar sesión hacen falta los valores 
    cp .env.example .env
    ```
 
+   Deja `VITE_API_URL` vacía: el frontend usa `/api` y reenvía esas llamadas al backend.
+
 2. Levanta todo:
 
    ```bash
-   docker compose up --build --watch
+   docker compose up -d --build
    ```
 
 3. Abre http://localhost:5173
+
+Si cambias `.env`, aplica los cambios con `docker compose up -d --force-recreate`.
 
 ## Comandos habituales
 
@@ -57,6 +61,7 @@ Solo necesitas Docker con Compose. Para iniciar sesión hacen falta los valores 
 |---|---|
 | Levantar con actualización en vivo | `docker compose up --build --watch` |
 | Levantar en segundo plano | `docker compose up -d --build` |
+| Aplicar cambios de `.env` | `docker compose up -d --force-recreate` |
 | Ver el estado | `docker compose ps -a` |
 | Ver los logs del backend | `docker compose logs -f backend` |
 | Detener y conservar los datos | `docker compose down` |
@@ -74,42 +79,89 @@ Por defecto, el backend no lee correos. Para activarlo, cambia estas variables e
 
 Después ejecuta `docker compose up -d`.
 
-## Compartir una demo con un túnel
+## Compartir la demo con un túnel
 
-Un túnel rápido de Cloudflare permite abrir la demo desde otros equipos, sin cuenta ni instalación. Requiere dos direcciones, una para el frontend y otra para el backend.
+Un túnel de Cloudflare publica la demo en internet para que cualquiera la abra desde su equipo. No necesitas cuenta ni instalar nada, y basta un solo túnel: el frontend reenvía las llamadas al backend.
 
-**Cada vez que se inicia un túnel, su dirección cambia.** Si se cierra, hay que repetir los pasos 2 a 4. Es solo para demos temporales: depende de tu computadora y de tu conexión.
-
-1. Con la aplicación corriendo, abre un túnel en cada terminal y deja ambas abiertas:
+1. Con la aplicación corriendo, abre el túnel y deja esa terminal abierta:
 
    ```bash
    docker run --rm --network helpdeskpro-db_default cloudflare/cloudflared:latest tunnel --no-autoupdate --url http://frontend:5173
-   docker run --rm --network helpdeskpro-db_default cloudflare/cloudflared:latest tunnel --no-autoupdate --url http://backend:8080
    ```
 
-2. Pide a quien administre Cognito que añada la dirección del frontend en **Allowed callback URLs** y **Allowed sign-out URLs**, sin barra final.
+   Copia la dirección `https://….trycloudflare.com` que aparece.
 
-3. Actualiza `.env` con las direcciones que te dieron los túneles:
+2. Pide a quien administre Cognito que añada esa dirección, sin barra final, en **Allowed callback URLs** y **Allowed sign-out URLs**.
+
+3. En `.env`, pon esa dirección en estas tres variables. En la última, conserva `localhost` y añade la del túnel después de una coma:
 
    ```properties
-   VITE_API_URL=<dirección del backend>
-   VITE_COGNITO_REDIRECT_URI=<dirección del frontend>
-   VITE_COGNITO_LOGOUT_URI=<dirección del frontend>
-   APP_CORS_ALLOWED_ORIGINS=http://localhost:5173,<dirección del frontend>
+   VITE_COGNITO_REDIRECT_URI=https://….trycloudflare.com
+   VITE_COGNITO_LOGOUT_URI=https://….trycloudflare.com
+   APP_CORS_ALLOWED_ORIGINS=http://localhost:5173,https://….trycloudflare.com
    ```
 
-4. Aplica los cambios y comprueba que el frontend tome la dirección nueva:
+4. Abre **una terminal nueva** (no cierres la del túnel) y aplica el cambio:
 
    ```bash
-   docker compose up -d --no-deps backend frontend
-   docker compose exec -T frontend sh -c 'echo "$VITE_API_URL"'
+   docker compose up -d --force-recreate backend frontend
    ```
 
-5. Abre la dirección del frontend en una ventana de incógnito. No inicies sesión desde `localhost` mientras dure la demo.
+   Usa siempre una terminal nueva después de editar `.env`: una terminal abierta desde antes puede conservar los valores viejos, y esos tienen prioridad sobre `.env`.
 
-**Al terminar:** cierra los túneles con `Ctrl+C`, devuelve esas variables a `localhost`, repite el paso 4 y pide que se quite la dirección de Cognito.
+5. Abre la dirección en una ventana de incógnito y compártela.
+
+**La dirección cambia cada vez que se inicia el túnel.** Si lo cierras, repite todos los pasos. Mientras dure la demo, inicia sesión desde la dirección del túnel, no desde `localhost`.
+
+**Al terminar:** cierra el túnel con `Ctrl+C`, devuelve las dos variables de Cognito a `http://localhost:5173`, deja `APP_CORS_ALLOWED_ORIGINS=http://localhost:5173`, repite el paso 4 y pide que se quite la dirección de Cognito.
+
+**Si algo falla:**
+
+| Problema | Solución |
+|---|---|
+| `No matching state found in storage` | El frontend sigue con la dirección anterior. Cierra la terminal (con la papelera, no solo `Ctrl+C`), abre una nueva y repite el paso 4. No hace falta reiniciar Docker. |
+| No se guardan cambios o sale `403` al guardar o importar | Falta la dirección del túnel en `APP_CORS_ALLOWED_ORIGINS`. Corrígela y repite el paso 4. |
+| `redirect_mismatch` en la página de Cognito | La dirección no está registrada en Cognito o la registraron con barra final. |
+| Inicias sesión, pero la lista de eventos sale vacía | `VITE_API_URL` debe estar vacía o valer `/api`. Corrígela y repite el paso 4. |
+| `network helpdeskpro-db_default not found` | La aplicación no está corriendo. Levántala con `docker compose up -d --build`. |
 
 **Antes de compartir la dirección:** quien tenga una cuenta de Cognito podrá entrar y, por ahora, los permisos por rol no están completos. Compártela solo con personas de confianza, usa datos simulados y confirma que el registro libre esté desactivado.
+
+## Pruebas de QA
+
+Cada historia tiene sus pruebas en [`qa/`](qa/): criterios de aceptación, casos de prueba y hallazgos en CSV. Hay dos tipos de prueba automática:
+
+| Tipo | Qué prueba | Historias | Necesita |
+|---|---|---|---|
+| Unitarias | Reglas del backend, sin base de datos | HU01, HU03, HU08, HU11 | Java 21 |
+| API | Llamadas reales al backend: sesión, roles, validaciones | HU01, HU02, HU03, HU04, HU08, HU11 | La aplicación corriendo |
+
+Requisitos: Node.js 20.6 o superior y, para las unitarias, Java 21.
+
+1. Crea tu archivo de configuración:
+
+   ```bash
+   cp qa/.env.example qa/.env
+   ```
+
+   Pon `QA_API_URL=http://localhost:8080`. Con eso ya corren las unitarias y las pruebas de API que no necesitan sesión.
+
+2. Corre las pruebas de una historia desde la raíz del repositorio, por ejemplo de HU01:
+
+   ```bash
+   node --env-file=qa/.env qa/unitarias.mjs HU01
+   node --env-file=qa/.env qa/correr.mjs HU01
+   ```
+
+   Para un solo caso: `node --env-file=qa/.env qa/correr.mjs HU01 HU01-CP-A-04`.
+
+Cada caso termina como `pasó`, `falló` o `bloqueado`. **Bloqueado** no es un error: indica qué falta, casi siempre un token.
+
+**Para las pruebas con sesión** hacen falta tokens de las cuentas de prueba (pídelas al equipo). Inicia sesión en la aplicación, abre `F12` → **Application** → **Session Storage** → la clave que empieza con `oidc.user:`, y copia `access_token` e `id_token` en las variables `QA_ACCESS_…` y `QA_ID_…` de `qa/.env`. Los tokens vencen en una hora; si un caso dice "está vencido", copia uno nuevo.
+
+**Para guardar los resultados** en el CSV de casos de prueba, añade `--anotar` al final y pon tu nombre en `QA_QUIEN`. Cada ejecución, con o sin `--anotar`, se agrega a `qa/HUnn/evidencia/`, que no se sube a git.
+
+Algunos casos fallan a propósito: muestran hallazgos abiertos. El CSV de hallazgos de cada historia indica cuáles.
 
 ## Seguridad
 
