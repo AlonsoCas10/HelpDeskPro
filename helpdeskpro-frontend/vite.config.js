@@ -11,5 +11,14 @@ export default defineConfig({
     strictPort: true,
     // Permite abrir la aplicación desde un túnel temporal de Cloudflare.
     allowedHosts: ['.trycloudflare.com'],
+    // Reenvía /api al backend: así un solo túnel sirve la aplicación y la API,
+    // y quien abra el enlace desde otro equipo también recibe los datos.
+    proxy: {
+      '/api': {
+        target: process.env.API_PROXY_TARGET || 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
   },
 })

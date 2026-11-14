@@ -43,13 +43,17 @@ Solo necesitas Docker con Compose. Para iniciar sesión hacen falta los valores 
    cp .env.example .env
    ```
 
+   Deja `VITE_API_URL` vacía: el frontend usa `/api` y reenvía esas llamadas al backend.
+
 2. Levanta todo:
 
    ```bash
-   docker compose up --build --watch
+   docker compose up -d --build
    ```
 
 3. Abre http://localhost:5173
+
+Si cambias `.env`, aplica los cambios con `docker compose up -d --force-recreate`.
 
 ## Comandos habituales
 
@@ -57,6 +61,7 @@ Solo necesitas Docker con Compose. Para iniciar sesión hacen falta los valores 
 |---|---|
 | Levantar con actualización en vivo | `docker compose up --build --watch` |
 | Levantar en segundo plano | `docker compose up -d --build` |
+| Aplicar cambios de `.env` | `docker compose up -d --force-recreate` |
 | Ver el estado | `docker compose ps -a` |
 | Ver los logs del backend | `docker compose logs -f backend` |
 | Detener y conservar los datos | `docker compose down` |
@@ -74,40 +79,47 @@ Por defecto, el backend no lee correos. Para activarlo, cambia estas variables e
 
 Después ejecuta `docker compose up -d`.
 
-## Compartir una demo con un túnel
+## Compartir la demo con un túnel
 
-Un túnel rápido de Cloudflare permite abrir la demo desde otros equipos, sin cuenta ni instalación. Requiere dos direcciones, una para el frontend y otra para el backend.
+Un túnel de Cloudflare publica la demo en internet para que cualquiera la abra desde su equipo. No necesitas cuenta ni instalar nada, y basta un solo túnel: el frontend reenvía las llamadas al backend.
 
-**Cada vez que se inicia un túnel, su dirección cambia.** Si se cierra, hay que repetir los pasos 2 a 4. Es solo para demos temporales: depende de tu computadora y de tu conexión.
-
-1. Con la aplicación corriendo, abre un túnel en cada terminal y deja ambas abiertas:
+1. Con la aplicación corriendo, abre el túnel y deja esa terminal abierta:
 
    ```bash
    docker run --rm --network helpdeskpro-db_default cloudflare/cloudflared:latest tunnel --no-autoupdate --url http://frontend:5173
-   docker run --rm --network helpdeskpro-db_default cloudflare/cloudflared:latest tunnel --no-autoupdate --url http://backend:8080
    ```
 
-2. Pide a quien administre Cognito que añada la dirección del frontend en **Allowed callback URLs** y **Allowed sign-out URLs**, sin barra final.
+   Copia la dirección `https://….trycloudflare.com` que aparece.
 
-3. Actualiza `.env` con las direcciones que te dieron los túneles:
+2. Pide a quien administre Cognito que añada esa dirección, sin barra final, en **Allowed callback URLs** y **Allowed sign-out URLs**.
+
+3. En `.env`, pon esa dirección en estas dos variables:
 
    ```properties
-   VITE_API_URL=<dirección del backend>
-   VITE_COGNITO_REDIRECT_URI=<dirección del frontend>
-   VITE_COGNITO_LOGOUT_URI=<dirección del frontend>
-   APP_CORS_ALLOWED_ORIGINS=http://localhost:5173,<dirección del frontend>
+   VITE_COGNITO_REDIRECT_URI=https://….trycloudflare.com
+   VITE_COGNITO_LOGOUT_URI=https://….trycloudflare.com
    ```
 
-4. Aplica los cambios y comprueba que el frontend tome la dirección nueva:
+4. Aplica el cambio en otra terminal:
 
    ```bash
-   docker compose up -d --no-deps backend frontend
-   docker compose exec -T frontend sh -c 'echo "$VITE_API_URL"'
+   docker compose up -d --force-recreate frontend
    ```
 
-5. Abre la dirección del frontend en una ventana de incógnito. No inicies sesión desde `localhost` mientras dure la demo.
+5. Abre la dirección en una ventana de incógnito y compártela.
 
-**Al terminar:** cierra los túneles con `Ctrl+C`, devuelve esas variables a `localhost`, repite el paso 4 y pide que se quite la dirección de Cognito.
+**La dirección cambia cada vez que se inicia el túnel.** Si lo cierras, repite todos los pasos. Mientras dure la demo, inicia sesión desde la dirección del túnel, no desde `localhost`.
+
+**Al terminar:** cierra el túnel con `Ctrl+C`, devuelve las dos variables a `http://localhost:5173`, repite el paso 4 y pide que se quite la dirección de Cognito.
+
+**Si algo falla:**
+
+| Problema | Solución |
+|---|---|
+| `No matching state found in storage` | El frontend sigue con la dirección anterior. Cierra la terminal, abre una nueva y repite el paso 4. Las variables que haya cargado la terminal tienen prioridad sobre `.env`. |
+| `redirect_mismatch` en la página de Cognito | La dirección no está registrada en Cognito o la registraron con barra final. |
+| Inicias sesión, pero la lista de eventos sale vacía | `VITE_API_URL` debe estar vacía o valer `/api`. Corrígela y repite el paso 4. |
+| `network helpdeskpro-db_default not found` | La aplicación no está corriendo. Levántala con `docker compose up -d --build`. |
 
 **Antes de compartir la dirección:** quien tenga una cuenta de Cognito podrá entrar y, por ahora, los permisos por rol no están completos. Compártela solo con personas de confianza, usa datos simulados y confirma que el registro libre esté desactivado.
 
