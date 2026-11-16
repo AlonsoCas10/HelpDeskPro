@@ -445,10 +445,6 @@ function Eventos() {
                   </th>
 
                   <th>
-                    Adjunto
-                  </th>
-
-                  <th>
                     Asunto
                   </th>
 
@@ -494,11 +490,6 @@ function Eventos() {
 
                     <td>
                       {evento.destinatario}
-                    </td>
-
-
-                    <td>
-                      {evento.archivos?.map((archivo) => archivo.nombre).join(", ")}
                     </td>
 
 
@@ -609,6 +600,17 @@ function Eventos() {
 
             <button
               className={
+                seccionDetalle === "Archivos adjuntos y enlaces"
+                  ? "tab-activa"
+                  : ""
+              }
+              onClick={() => setSeccionDetalle("Archivos adjuntos y enlaces")}
+            >
+              Archivos adjuntos y enlaces
+            </button>
+
+            <button
+              className={
                 seccionDetalle === "Análisis técnico"
                   ? "tab-activa"
                   : ""
@@ -699,15 +701,6 @@ function Eventos() {
               <p>
                 <strong>Clasificación:</strong>
                 {eventoSeleccionado.clasificacion || "No disponible"}
-              </p>
-
-              <p>
-                <strong>Adjunto:</strong>
-                {eventoSeleccionado.archivos?.length > 0
-                  ? eventoSeleccionado.archivos
-                      .map((archivo) => archivo.nombre || "Archivo adjunto")
-                      .join(", ")
-                  : "Sin adjuntos"}
               </p>
 
             </div>
@@ -992,6 +985,83 @@ function Eventos() {
 
 </div>
 )}
+
+          {seccionDetalle === "Archivos adjuntos y enlaces" && (
+            <div className="detalle-recursos">
+
+              <div className="detalle-card detalle-recursos-card">
+                <h2>Archivos adjuntos</h2>
+
+                {eventoSeleccionado.archivos?.length > 0 ? (
+                  <div className="detalle-recursos-lista">
+                    {eventoSeleccionado.archivos.map((archivo, index) => (
+                      <div
+                        className="detalle-recurso"
+                        key={archivo.id || `${archivo.nombre}-${index}`}
+                      >
+                        <div className="detalle-recurso-icono" aria-hidden="true">
+                          📎
+                        </div>
+
+                        <div className="detalle-recurso-contenido">
+                          <strong>{archivo.nombre || "No disponible"}</strong>
+                          <span>
+                            Tipo: {archivo.tipo || "No disponible"}
+                          </span>
+                          <span>
+                            Extensión: {archivo.extension || "No disponible"}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="detalle-recursos-vacio">
+                    No hay archivos adjuntos.
+                  </p>
+                )}
+              </div>
+
+              <div className="detalle-card detalle-recursos-card">
+                <h2>Enlaces</h2>
+
+                {eventoSeleccionado.enlaces?.length > 0 ? (
+                  <div className="detalle-recursos-lista">
+                    {eventoSeleccionado.enlaces.map((enlace, index) => (
+                      <div
+                        className="detalle-recurso"
+                        key={enlace.id || `${enlace.url}-${index}`}
+                      >
+                        <div className="detalle-recurso-icono" aria-hidden="true">
+                          🔗
+                        </div>
+
+                        <div className="detalle-recurso-contenido">
+                          {enlace.url ? (
+                            <span
+                              className="detalle-recurso-enlace"
+                            >
+                              {enlace.url}
+                            </span>
+                          ) : (
+                            <strong>No disponible</strong>
+                          )}
+                          <span>
+                            Dominio: {enlace.dominio || "No disponible"}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="detalle-recursos-vacio">
+                    No hay enlaces.
+                  </p>
+                )}
+              </div>
+
+            </div>
+          )}
 
 </div>
 )}

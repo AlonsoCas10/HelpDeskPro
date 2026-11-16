@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from 'react-oidc-context'
 import './App.css'
 import { setAccessToken } from './api/apiClient'
 import Dashboard from './components/Dashboard'
+import LoadingScreen from './components/LoadingScreen'
 import Logo from './components/Logo'
 
 const logoutUri = import.meta.env.VITE_COGNITO_LOGOUT_URI
@@ -11,6 +12,7 @@ const cognitoDomain = import.meta.env.VITE_COGNITO_DOMAIN
 
 function App() {
   const auth = useAuth()
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
   useEffect(() => {
     setAccessToken(auth.isAuthenticated ? auth.user?.access_token : null)
@@ -33,8 +35,23 @@ function App() {
     window.location.assign(logoutUrl.toString())
   }
 
+  async function iniciarSesion() {
+    setIsRedirecting(true)
+
+    try {
+      await auth.signinRedirect()
+    } catch (error) {
+      console.error('No se pudo iniciar la redirección a Cognito:', error)
+      setIsRedirecting(false)
+    }
+  }
+
+  if (isRedirecting) {
+    return <LoadingScreen mensaje="Redirigiendo al inicio de sesión..." />
+  }
+
   if (auth.isLoading) {
-    return <p>Cargando sesión...</p>
+    return <LoadingScreen mensaje="Cargando tu sesión..." />
   }
 
   if (auth.error) {
@@ -57,7 +74,7 @@ function App() {
         <Logo />
         <h1>FactSafe</h1>
         <p className="subtitle">“No solo detectamos amenazas, las interpretamos antes de que afecten a tu negocio.”</p>
-        <button type="button" onClick={() => auth.signinRedirect()}>
+        <button type="button" onClick={iniciarSesion}>
           Iniciar sesión o registrarse
         </button>
       </div>

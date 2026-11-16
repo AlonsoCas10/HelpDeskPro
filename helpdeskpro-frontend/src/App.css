@@ -33,6 +33,94 @@ body {
   padding: 20px;
 }
 
+/* ==========================================
+   PANTALLA DE CARGA
+   ========================================== */
+
+.loading-page {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(
+    135deg,
+    #0f172a,
+    #1e3a8a,
+    #2563eb
+  );
+
+  padding: 20px;
+}
+
+.loading-container {
+  width: 100%;
+  max-width: 420px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background-color: #ffffff;
+
+  padding: 45px 40px;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.loading-container .logo-container {
+  margin-bottom: 24px;
+}
+
+.loading-indicator {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+
+.loading-indicator span {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background-color: #2563eb;
+
+  animation: loading-pulse 1.2s ease-in-out infinite;
+}
+
+.loading-indicator span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.loading-indicator span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.loading-message {
+  color: #374151;
+  font-size: 15px;
+  text-align: center;
+}
+
+@keyframes loading-pulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
 
 /* ==========================================
    TARJETA
@@ -3470,6 +3558,90 @@ body,
 
   .detalle-container .btn-guardar-analisis {
     margin-left: 48px;
+  }
+}
+
+.detalle-recursos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+  margin-top: 25px;
+}
+
+.detalle-recursos-card {
+  min-width: 0;
+}
+
+.detalle-recursos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.detalle-recurso {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.detalle-recurso-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #ecfeff;
+  font-size: 16px;
+}
+
+.detalle-recurso-contenido {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.detalle-recurso-contenido strong,
+.detalle-recurso-enlace {
+  overflow-wrap: anywhere;
+}
+
+.detalle-recurso-contenido strong {
+  color: #334155;
+  font-weight: 600;
+}
+
+.detalle-recurso-enlace {
+  color: #0891b2;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.detalle-recurso-enlace:hover {
+  text-decoration: underline;
+}
+
+.detalle-recursos-vacio {
+  margin: 20px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .detalle-recursos {
+    grid-template-columns: 1fr;
   }
 }
 

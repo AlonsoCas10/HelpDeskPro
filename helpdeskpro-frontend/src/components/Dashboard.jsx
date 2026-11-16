@@ -243,7 +243,7 @@ useEffect(() => {
       <h1>Dashboard General</h1>
 
       <p className="bienvenida">
-        Bienvenido a HelpDeskPro
+        Bienvenido a FactSafe
       </p>
 
       <div className="dashboard-cards">
