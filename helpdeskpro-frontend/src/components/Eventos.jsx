@@ -2,6 +2,32 @@
 import '../App.css'
 import apiClient from '../api/apiClient'
 
+const formatearMontoImpacto = (valor, moneda) => {
+  if (valor === null || valor === undefined) {
+    return 'No estimable'
+  }
+
+  const monto = Number(valor)
+  const texto = Number.isFinite(monto)
+    ? monto.toLocaleString('es-PE', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    : String(valor)
+
+  return moneda ? `${texto} ${moneda}` : texto
+}
+
+const nombreConfiabilidad = (valor) => {
+  const nombres = {
+    CONFIRMADO_POR_CONTEXTO: 'Confirmado por contexto',
+    REFERENCIAL: 'Referencial',
+    NO_ESTIMABLE: 'No estimable',
+  }
+
+  return nombres[valor] || 'No estimable'
+}
+
 function Eventos() {
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
@@ -27,6 +53,10 @@ function Eventos() {
   
   const [resultado, setResultado] = useState("")
   const [resultadoGuardado, setResultadoGuardado] = useState("")
+
+  const [impactoFinanciero, setImpactoFinanciero] = useState(null)
+  const [impactoFinancieroCargando, setImpactoFinancieroCargando] = useState(false)
+  const [impactoFinancieroError, setImpactoFinancieroError] = useState("")
 
   
 
@@ -79,6 +109,59 @@ function Eventos() {
     }
 
   }, [])
+
+  useEffect(() => {
+    if (
+      seccionDetalle !== "Impacto financiero" ||
+      !eventoSeleccionado?.id
+    ) {
+      return
+    }
+
+    let componenteActivo = true
+
+    async function cargarImpactoFinanciero() {
+      setImpactoFinancieroCargando(true)
+      setImpactoFinancieroError("")
+
+      try {
+        const respuesta = await apiClient.get(
+          `/impacto-financiero/eventos/${eventoSeleccionado.id}`
+        )
+
+        if (componenteActivo) {
+          setImpactoFinanciero(respuesta.data)
+        }
+      } catch (error) {
+        if (!componenteActivo) {
+          return
+        }
+
+        setImpactoFinanciero(null)
+
+        if (error.response?.status === 404) {
+          setImpactoFinancieroError(
+            "Impacto financiero no estimable por falta de contexto."
+          )
+        } else {
+          setImpactoFinancieroError(
+            error.response?.data?.message ||
+            "No se pudo consultar el impacto financiero."
+          )
+        }
+      } finally {
+        if (componenteActivo) {
+          setImpactoFinancieroCargando(false)
+        }
+      }
+    }
+
+    cargarImpactoFinanciero()
+
+    return () => {
+      componenteActivo = false
+    }
+  }, [seccionDetalle, eventoSeleccionado])
 
 
   // =====================================================
@@ -985,6 +1068,159 @@ function Eventos() {
 
 </div>
 )}
+
+          {seccionDetalle === "Impacto financiero" && (
+            <div className="impacto-financiero">
+
+              {impactoFinancieroCargando && (
+                <div className="detalle-card impacto-estado">
+                  <p>Cargando impacto financiero...</p>
+                </div>
+              )}
+
+              {!impactoFinancieroCargando && impactoFinancieroError && (
+                <div className="detalle-card impacto-estado">
+                  <h2>Impacto financiero</h2>
+                  <p>{impactoFinancieroError}</p>
+                </div>
+              )}
+
+              {!impactoFinancieroCargando && !impactoFinancieroError && impactoFinanciero && (
+                <>
+                  <div className="detalle-cards impacto-resumen-cards">
+                    <div className="detalle-card">
+                      <h2>Resumen del impacto</h2>
+
+                      <div className="impacto-categoria">
+                        <span>Categoría</span>
+                        <strong className={`impacto-categoria-${String(impactoFinanciero.categoria || '').toLowerCase()}`}>
+                          {impactoFinanciero.categoria || 'No estimable'}
+                        </strong>
+                      </div>
+
+                      <div className="detalle-info">
+                        <p>
+                          <strong>Cliente:</strong>{' '}
+                          {impactoFinanciero.razonSocialCliente || 'No disponible'}
+                        </p>
+                        <p>
+                          <strong>RUC:</strong>{' '}
+                          {impactoFinanciero.rucCliente || 'No disponible'}
+                        </p>
+                        <p>
+                          <strong>Moneda:</strong>{' '}
+                          {impactoFinanciero.moneda || 'No disponible'}
+                        </p>
+                      </div>
+
+                      <p className="impacto-aviso">
+                        {impactoFinanciero.mensajePotencial ||
+                          'Impacto financiero estimado; no representa una pérdida confirmada.'}
+                      </p>
+                    </div>
+
+                    <div className="detalle-card">
+                      <h2>Exposición directa</h2>
+
+                      <div className="impacto-monto-principal">
+                        {formatearMontoImpacto(
+                          impactoFinanciero.exposicionDirectaPotencial,
+                          impactoFinanciero.moneda
+                        )}
+                      </div>
+
+                      <div className="detalle-info">
+                        <p>
+                          <strong>Origen:</strong>{' '}
+                          {impactoFinanciero.exposicionDirectaPotencial == null
+                            ? 'No disponible'
+                            : 'Correo'}
+                        </p>
+                        <p>
+                          <strong>Confiabilidad:</strong>{' '}
+                          {nombreConfiabilidad(impactoFinanciero.confiabilidadExposicion)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="detalle-cards impacto-operacional-cards">
+                    <div className="detalle-card">
+                      <h2>Impacto por interrupción</h2>
+                      <div className="detalle-info">
+                        <p>
+                          <strong>Volumen semanal:</strong>{' '}
+                          {formatearMontoImpacto(
+                            impactoFinanciero.montoSemanal,
+                            impactoFinanciero.moneda
+                          )}
+                        </p>
+                        <p>
+                          <strong>Volumen diario:</strong>{' '}
+                          {formatearMontoImpacto(
+                            impactoFinanciero.montoDiario,
+                            impactoFinanciero.moneda
+                          )}
+                        </p>
+                        <p>
+                          <strong>Días operativos:</strong>{' '}
+                          {impactoFinanciero.diasOperativos ?? 'No estimable'}
+                        </p>
+                        <p>
+                          <strong>Días de interrupción:</strong>{' '}
+                          {impactoFinanciero.diasInterrupcion ?? 'No estimable'}
+                        </p>
+                        <p>
+                          <strong>Volumen potencial afectado:</strong>{' '}
+                          {formatearMontoImpacto(
+                            impactoFinanciero.volumenPotencialAfectado,
+                            impactoFinanciero.moneda
+                          )}
+                        </p>
+                        <p>
+                          <strong>Comisión:</strong>{' '}
+                          {impactoFinanciero.comision == null
+                            ? 'No estimable'
+                            : `${(Number(impactoFinanciero.comision) * 100).toLocaleString('es-PE', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 6,
+                              })}%`}
+                        </p>
+                        <p>
+                          <strong>Pérdida estimada de ingresos:</strong>{' '}
+                          {formatearMontoImpacto(
+                            impactoFinanciero.perdidaEstimadaIngresos,
+                            impactoFinanciero.moneda
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="detalle-card">
+                      <h2>Explicación del cálculo</h2>
+                      <p className="impacto-explicacion">
+                        {impactoFinanciero.explicacionCalculo ||
+                          'No existe una explicación disponible para este cálculo.'}
+                      </p>
+
+                      {impactoFinanciero.fuentesCalculo && (
+                        <p className="impacto-fuentes">
+                          <strong>Fuentes:</strong> {impactoFinanciero.fuentesCalculo}
+                        </p>
+                      )}
+
+                      {impactoFinanciero.fechaCalculo && (
+                        <p className="impacto-fecha">
+                          <strong>Fecha de cálculo:</strong>{' '}
+                          {new Date(impactoFinanciero.fechaCalculo).toLocaleString('es-PE')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           {seccionDetalle === "Archivos adjuntos y enlaces" && (
             <div className="detalle-recursos">

@@ -3633,6 +3633,70 @@ body,
   text-decoration: underline;
 }
 
+.impacto-financiero {
+  display: grid;
+  gap: 16px;
+}
+
+.impacto-estado {
+  width: 100%;
+}
+
+.impacto-categoria {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.impacto-categoria strong {
+  font-size: 18px;
+}
+
+.impacto-categoria-bajo strong,
+.impacto-categoria-bajo {
+  color: #15803d;
+}
+
+.impacto-categoria-medio strong,
+.impacto-categoria-medio {
+  color: #a16207;
+}
+
+.impacto-categoria-alto strong,
+.impacto-categoria-alto {
+  color: #c2410c;
+}
+
+.impacto-categoria-crítico strong,
+.impacto-categoria-crítico {
+  color: #dc2626;
+}
+
+.impacto-aviso,
+.impacto-explicacion,
+.impacto-fuentes,
+.impacto-fecha {
+  color: #475569;
+  line-height: 1.55;
+}
+
+.impacto-monto-principal {
+  margin: 8px 0 16px;
+  color: #0f172a;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.impacto-fuentes {
+  margin-top: 16px;
+  overflow-wrap: anywhere;
+}
+
 .detalle-recursos-vacio {
   margin: 20px 0 0;
   color: #64748b;

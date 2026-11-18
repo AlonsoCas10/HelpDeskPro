@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.helpdeskpro.helpdeskpro_backend.enums.EstadoConexion;
+
 @Entity
 @Table(name = "evento")
 @Getter

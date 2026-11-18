@@ -9,9 +9,9 @@ import java.time.format.DateTimeParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.helpdeskpro.helpdeskpro_backend.enums.EstadoConexion;
 import com.helpdeskpro.helpdeskpro_backend.model.Archivo;
 import com.helpdeskpro.helpdeskpro_backend.model.Enlace;
-import com.helpdeskpro.helpdeskpro_backend.model.EstadoConexion;
 import com.helpdeskpro.helpdeskpro_backend.model.Evento;
 import com.helpdeskpro.helpdeskpro_backend.repository.EventoRepository;
 

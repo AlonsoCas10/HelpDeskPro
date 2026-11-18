@@ -18,6 +18,9 @@ public class EventoService {
     @Autowired
     private EvaluadorRiesgoService evaluadorRiesgoService;
 
+    @Autowired
+    private IncidenciaService incidenciaService;
+
     // =====================================================
     // GUARDAR EVENTO
     // =====================================================
@@ -62,6 +65,10 @@ public class EventoService {
             eventoGuardado.setCodigo(codigo);
 
             eventoGuardado = eventoRepository.save(eventoGuardado);
+        }
+
+        if (incidenciaService != null) {
+            incidenciaService.generarDesdeEvento(eventoGuardado);
         }
 
         return eventoGuardado;
