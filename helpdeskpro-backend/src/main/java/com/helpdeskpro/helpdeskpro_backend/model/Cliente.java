@@ -1,119 +1,62 @@
 package com.helpdeskpro.helpdeskpro_backend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "cliente")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "configuracion_empresa_id")
+    private ConfiguracionEmpresa configuracionEmpresa;
+
     private String razonSocial;
     private String ruc;
 
     private String dominioAutorizado;
     private String correoAutorizado;
+    
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+        name = "idMoneda",
+        nullable = false,
+        referencedColumnName = "id"
+    )
+    private Moneda moneda;
 
-    private BigDecimal montoPromedioHabitual;
-    private BigDecimal montoMaximoHabitual;
+    @Column(name = "monto_maximo", precision = 10, scale = 2)
+    private BigDecimal montoMaximo;
+
+    @Column(name = "monto_semanal", precision = 10, scale = 2)
+    private BigDecimal montoSemanal;
+
+    @Column(name = "monto_diario", precision = 10, scale = 2)
+    private BigDecimal montoDiario;
+
+    @Column(name = "monto_promedio_operacion", precision = 10, scale = 2)
+    private BigDecimal montoPromedioOperacion;
 
     private boolean vip;
     private boolean activo;
 
-    @ManyToOne
-    @JoinColumn(name = "configuracion_empresa_id")
-    private ConfiguracionEmpresa configuracionEmpresa;
+    @Column(name = "comision", precision = 9, scale = 6)
+    private BigDecimal comision;
 
-    public Cliente() {
-    }
+    @Column(name = "dias_operativos")
+    private Integer diasOperativos;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getRazonSocial() {
-        return razonSocial;
-    }
-
-    public void setRazonSocial(String razonSocial) {
-        this.razonSocial = razonSocial;
-    }
-
-    public String getRuc() {
-        return ruc;
-    }
-
-    public void setRuc(String ruc) {
-        this.ruc = ruc;
-    }
-
-    public String getDominioAutorizado() {
-        return dominioAutorizado;
-    }
-
-    public void setDominioAutorizado(String dominioAutorizado) {
-        this.dominioAutorizado = dominioAutorizado;
-    }
-
-    public String getCorreoAutorizado() {
-        return correoAutorizado;
-    }
-
-    public void setCorreoAutorizado(String correoAutorizado) {
-        this.correoAutorizado = correoAutorizado;
-    }
-
-    public BigDecimal getMontoPromedioHabitual() {
-        return montoPromedioHabitual;
-    }
-
-    public void setMontoPromedioHabitual(BigDecimal montoPromedioHabitual) {
-        this.montoPromedioHabitual = montoPromedioHabitual;
-    }
-
-    public BigDecimal getMontoMaximoHabitual() {
-        return montoMaximoHabitual;
-    }
-
-    public void setMontoMaximoHabitual(BigDecimal montoMaximoHabitual) {
-        this.montoMaximoHabitual = montoMaximoHabitual;
-    }
-
-    public boolean isVip() {
-        return vip;
-    }
-
-    public void setVip(boolean vip) {
-        this.vip = vip;
-    }
-
-    public boolean isActivo() {
-        return activo;
-    }
-
-    public void setActivo(boolean activo) {
-        this.activo = activo;
-    }
-
-    public ConfiguracionEmpresa getConfiguracionEmpresa() {
-        return configuracionEmpresa;
-    }
-
-    public void setConfiguracionEmpresa(ConfiguracionEmpresa configuracionEmpresa) {
-        this.configuracionEmpresa = configuracionEmpresa;
-    }
+    @Column(name = "tiempo_interrupcion")
+    private Integer tiempoInterrupcion;
 }

@@ -4,6 +4,42 @@ import apiClient from '../api/apiClient'
 import * as XLSX from 'xlsx'
 import DatosCargados from './DatosCargados'
 
+const normalizarEncabezado = (valor) =>
+  String(valor ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toLowerCase()
+
+const columnasCliente = [
+  { titulo: 'RUC', claves: ['ruc'] },
+  { titulo: 'Razón social', claves: ['razonSocial', 'razon social'] },
+  { titulo: 'Dominio autorizado', claves: ['dominioAutorizado', 'dominio autorizado'] },
+  { titulo: 'Correo autorizado', claves: ['correoAutorizado', 'correo autorizado'] },
+  { titulo: 'Moneda', claves: ['moneda'] },
+  { titulo: 'Monto semanal', claves: ['montoSemanal', 'monto promedio habitual', 'monto promedio'] },
+  { titulo: 'Monto diario', claves: ['montoDiario', 'monto diario'] },
+  { titulo: 'Monto promedio por operación', claves: ['montoPromedioOperacion', 'monto promedio por operación'] },
+  { titulo: 'Monto máximo', claves: ['montoMaximo', 'monto máximo habitual', 'monto máximo'] },
+  { titulo: 'Comisión', claves: ['comision', 'comisión'] },
+  { titulo: 'Días operativos', claves: ['diasOperativos', 'días operativos'] },
+  { titulo: 'Tiempo de interrupción', claves: ['tiempoInterrupcion', 'tiempo interrupción', 'tiempo estimado de interrupción', 'días de interrupción', 'días estimados de interrupción'] },
+  { titulo: 'VIP', claves: ['vip'] },
+  { titulo: 'Estado', claves: ['activo', 'estado'] },
+]
+
+const valorCliente = (cliente, claves) => {
+  const entradas = Object.entries(cliente)
+  const entrada = entradas.find(([clave]) => {
+    const claveNormalizada = normalizarEncabezado(clave)
+    return claves.some(
+      (alias) => normalizarEncabezado(alias) === claveNormalizada
+    )
+  })
+
+  return entrada?.[1] ?? ''
+}
+
 function Configuracion({ esAdministrador = false }) {
 
   const [seccion, setSeccion] = useState("asistente")
@@ -14,7 +50,8 @@ function Configuracion({ esAdministrador = false }) {
   // ==========================================
 
   const [nombreEmpresa, setNombreEmpresa] = useState('')
-  const [moneda, setMoneda] = useState('PEN')
+  const [monedas, setMonedas] = useState([])
+  const [monedaId, setMonedaId] = useState('')
   const [umbralMontoRelevante, setUmbralMontoRelevante] = useState('')
   const [cantidadColaboradores, setCantidadColaboradores] = useState('')
   const [areasCriticas, setAreasCriticas] = useState('')
@@ -67,6 +104,34 @@ function Configuracion({ esAdministrador = false }) {
   const [gmailActivo, setGmailActivo] = useState(false)
   const [gmailCargando, setGmailCargando] = useState(false)
   const [gmailError, setGmailError] = useState('')
+
+  useEffect(() => {
+
+    apiClient.get('/monedas')
+      .then((respuesta) => {
+        const catalogo = (respuesta.data ?? [])
+          .map((moneda) => ({
+            ...moneda,
+            id: Number(
+              moneda.id ??
+              moneda.idMoneda ??
+              moneda.monedaId
+            ),
+          }))
+          .filter((moneda) => Number.isInteger(moneda.id))
+
+        setMonedas(catalogo)
+
+        if (!monedaId && catalogo.length > 0) {
+          setMonedaId(String(catalogo[0].id))
+        }
+      })
+      .catch(() => {
+        setMonedas([])
+      })
+
+  }, [])
+
 
   useEffect(() => {
 
@@ -335,7 +400,7 @@ function Configuracion({ esAdministrador = false }) {
 
     if (
       !nombreEmpresa ||
-      !moneda ||
+      !monedaId ||
       !umbralMontoRelevante ||
       !cantidadColaboradores ||
       !areasCriticas ||
@@ -355,7 +420,6 @@ function Configuracion({ esAdministrador = false }) {
       return
 
     }
-
 
     // ------------------------------------------
     // VALIDAR PÉRDIDA VIP
@@ -442,6 +506,14 @@ function Configuracion({ esAdministrador = false }) {
 
     try {
 
+      const idMoneda = Number(monedaId)
+
+      if (!Number.isInteger(idMoneda)) {
+        throw new Error(
+          'La moneda seleccionada no tiene un identificador válido.'
+        )
+      }
+
       // ==========================================
       // 1. GUARDAR CONFIGURACIÓN GENERAL
       // ==========================================
@@ -453,7 +525,9 @@ function Configuracion({ esAdministrador = false }) {
 
             nombreEmpresa,
 
-            moneda,
+            moneda: {
+              id: idMoneda
+            },
 
             umbralMontoRelevante:
               Number(
@@ -618,8 +692,18 @@ function Configuracion({ esAdministrador = false }) {
         error.response?.data
       )
 
+      const respuesta = error.response?.data
+      const detalle = typeof respuesta === 'object' && respuesta !== null
+        ? [
+            respuesta.message,
+            respuesta.error,
+            respuesta.status ? `HTTP ${respuesta.status}` : '',
+            respuesta.path,
+          ].filter(Boolean).join(' - ') || JSON.stringify(respuesta)
+        : respuesta || error.message
+
       alert(
-        "No se pudo guardar la configuración."
+        `No se pudo guardar la configuración.\n\n${detalle}`
       )
 
     }
@@ -1084,21 +1168,23 @@ function Configuracion({ esAdministrador = false }) {
               </label>
 
               <select
-                value={moneda}
+                value={monedaId}
                 onChange={(e) =>
-                  setMoneda(
+                  setMonedaId(
                     e.target.value
                   )
                 }
               >
 
-                <option value="PEN">
-                  Soles (PEN)
+                <option value="">
+                  Seleccione una moneda
                 </option>
 
-                <option value="USD">
-                  Dólares (USD)
-                </option>
+                {monedas.map((item) => (
+                  <option key={item.id} value={String(item.id)}>
+                    {item.nombre}
+                  </option>
+                ))}
 
               </select>
 
@@ -1595,19 +1681,11 @@ function Configuracion({ esAdministrador = false }) {
 
                           <tr>
 
-                            {Object.keys(
-                              clientesExcel[0]
-                            ).map(
-                              (columna) => (
-
-                                <th
-                                  key={columna}
-                                >
-                                  {columna}
-                                </th>
-
-                              )
-                            )}
+                            {columnasCliente.map((columna) => (
+                              <th key={columna.titulo}>
+                                {columna.titulo}
+                              </th>
+                            ))}
 
                           </tr>
 
@@ -1623,25 +1701,13 @@ function Configuracion({ esAdministrador = false }) {
                                 key={indice}
                               >
 
-                                {Object.values(
-                                  cliente
-                                ).map(
-                                  (
-                                    valor,
-                                    index
-                                  ) => (
-
-                                    <td
-                                      key={index}
-                                    >
-                                      {String(
-                                        valor ??
-                                          ""
-                                      )}
-                                    </td>
-
-                                  )
-                                )}
+                                {columnasCliente.map((columna) => (
+                                  <td key={columna.titulo}>
+                                    {String(
+                                      valorCliente(cliente, columna.claves)
+                                    )}
+                                  </td>
+                                ))}
 
                               </tr>
 

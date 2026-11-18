@@ -8,6 +8,7 @@ const monto = (valor) =>
   valor === null || valor === undefined
     ? ''
     : Number(valor).toLocaleString('es-PE')
+const moneda = (fila) => fila.moneda?.nombre ?? ''
 const configuracion = (fila) => fila.configuracionEmpresa?.id ?? ''
 
 const TABLAS = [
@@ -20,8 +21,14 @@ const TABLAS = [
       { titulo: 'Razón social', valor: (fila) => fila.razonSocial },
       { titulo: 'Dominio autorizado', valor: (fila) => fila.dominioAutorizado },
       { titulo: 'Correo autorizado', valor: (fila) => fila.correoAutorizado },
-      { titulo: 'Monto promedio', valor: (fila) => monto(fila.montoPromedioHabitual) },
-      { titulo: 'Monto máximo', valor: (fila) => monto(fila.montoMaximoHabitual) },
+      { titulo: 'Moneda', valor: moneda },
+      { titulo: 'Monto semanal', valor: (fila) => monto(fila.montoSemanal) },
+      { titulo: 'Monto diario', valor: (fila) => monto(fila.montoDiario) },
+      { titulo: 'Monto promedio por operación', valor: (fila) => monto(fila.montoPromedioOperacion) },
+      { titulo: 'Monto máximo', valor: (fila) => monto(fila.montoMaximo) },
+      { titulo: 'Comisión', valor: (fila) => fila.comision },
+      { titulo: 'Días operativos', valor: (fila) => fila.diasOperativos },
+      { titulo: 'Tiempo de interrupción', valor: (fila) => fila.tiempoInterrupcion },
       { titulo: 'VIP', valor: (fila) => siNo(fila.vip) },
       { titulo: 'Estado', valor: (fila) => estado(fila.activo) },
       { titulo: 'Configuración', valor: configuracion },

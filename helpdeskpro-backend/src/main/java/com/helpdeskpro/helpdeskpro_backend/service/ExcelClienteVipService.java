@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -66,6 +69,10 @@ public class ExcelClienteVipService {
             Sheet hoja = workbook.getSheetAt(0);
 
             DataFormatter formatter = new DataFormatter();
+            Map<String, Integer> columnas = construirMapaColumnas(
+                    hoja.getRow(0),
+                    formatter
+            );
 
             System.out.println(
                     "Cantidad de filas: "
@@ -95,52 +102,76 @@ public class ExcelClienteVipService {
                 // LEER COLUMNAS DEL EXCEL
                 // ==========================================
 
-                // A - RUC
                 String ruc = obtenerTexto(
-                        fila.getCell(0),
-                        formatter
+                        fila, columnas, formatter, 0,
+                        "ruc"
                 );
 
-                // B - Razón social
                 String razonSocial = obtenerTexto(
-                        fila.getCell(1),
-                        formatter
+                        fila, columnas, formatter, 1,
+                        "razonSocial", "razon social"
                 );
 
-                // C - Dominio autorizado
                 String dominioAutorizado = obtenerTexto(
-                        fila.getCell(2),
-                        formatter
+                        fila, columnas, formatter, 2,
+                        "dominioAutorizado", "dominio autorizado"
                 );
 
-                // D - Correo autorizado
                 String correoAutorizado = obtenerTexto(
-                        fila.getCell(3),
-                        formatter
+                        fila, columnas, formatter, 3,
+                        "correoAutorizado", "correo autorizado"
                 );
 
-                // E - Monto promedio habitual
-                String montoPromedioTexto = obtenerTexto(
-                        fila.getCell(4),
-                        formatter
+                String montoSemanalTexto = obtenerTexto(
+                        fila, columnas, formatter, 4,
+                        "montoSemanal", "monto promedio habitual", "monto promedio"
                 );
 
-                // F - Monto máximo habitual
+                String montoDiarioTexto = obtenerTexto(
+                        fila, columnas, formatter, -1,
+                        "montoDiario", "monto diario"
+                );
+
+                String montoPromedioOperacionTexto = obtenerTexto(
+                        fila, columnas, formatter, -1,
+                        "montoPromedioOperacion", "monto promedio por operación"
+                );
+
                 String montoMaximoTexto = obtenerTexto(
-                        fila.getCell(5),
-                        formatter
+                        fila, columnas, formatter, 5,
+                        "montoMaximo", "monto máximo habitual", "monto máximo"
                 );
 
-                // G - VIP
+                String comisionTexto = obtenerTexto(
+                        fila, columnas, formatter, -1,
+                        "comision", "comisión"
+                );
+
+                String diasOperativosTexto = obtenerTexto(
+                        fila, columnas, formatter, -1,
+                        "diasOperativos", "días operativos"
+                );
+
+                String tiempoInterrupcionTexto = obtenerTexto(
+                        fila, columnas, formatter, -1,
+                        "tiempoInterrupcion",
+                        "tiempo interrupción",
+                        "tiempo de interrupción",
+                        "tiempo de interrupción (días)",
+                        "tiempo estimado de interrupción",
+                        "tiempo estimado de interrupción (días)",
+                        "días de interrupción",
+                        "días estimados de interrupción"
+                );
+
                 String vipTexto = obtenerTexto(
-                        fila.getCell(6),
-                        formatter
+                        fila, columnas, formatter, 6,
+                        "vip"
                 );
 
-                // H - Estado
                 String estadoTexto = obtenerTexto(
-                        fila.getCell(7),
-                        formatter
+                        fila, columnas, formatter, 7,
+                        "activo", "estado"
                 );
 
                 // ==========================================
@@ -173,15 +204,27 @@ public class ExcelClienteVipService {
                 // CONVERTIR MONTOS
                 // ==========================================
 
-                BigDecimal montoPromedio =
+                BigDecimal montoSemanal =
                         convertirMonto(
-                                montoPromedioTexto
+                                montoSemanalTexto
                         );
+
+                BigDecimal montoDiario = convertirMonto(montoDiarioTexto);
+
+                BigDecimal montoPromedioOperacion = convertirMonto(
+                        montoPromedioOperacionTexto
+                );
 
                 BigDecimal montoMaximo =
                         convertirMonto(
                                 montoMaximoTexto
                         );
+
+                BigDecimal comision = convertirComision(comisionTexto);
+                Integer diasOperativos = convertirEntero(diasOperativosTexto);
+                Integer tiempoInterrupcion = convertirEntero(
+                        tiempoInterrupcionTexto
+                );
 
                 // ==========================================
                 // CONVERTIR VIP
@@ -223,7 +266,7 @@ public class ExcelClienteVipService {
                 );
 
                 System.out.println(
-                        "Monto promedio: " + montoPromedio
+                        "Monto semanal: " + montoSemanal
                 );
 
                 System.out.println(
@@ -285,17 +328,52 @@ public class ExcelClienteVipService {
                         correoAutorizado
                 );
 
-                cliente.setMontoPromedioHabitual(
-                        montoPromedio
+                cliente.setMoneda(configuracion.getMoneda());
+
+                asignarSiExiste(
+                        columnas, cliente::setMontoSemanal, montoSemanal,
+                        "montosemanal", "montopromediohabitual", "montopromedio"
+                );
+                asignarSiExiste(
+                        columnas, cliente::setMontoDiario, montoDiario,
+                        "montodiario"
+                );
+                asignarSiExiste(
+                        columnas, cliente::setMontoPromedioOperacion,
+                        montoPromedioOperacion, "montopromediooperacion",
+                        "montopromedioporoperacion"
+                );
+                asignarSiExiste(
+                        columnas, cliente::setMontoMaximo, montoMaximo,
+                        "montomaximo", "montomaximohabitual"
+                );
+                asignarSiExiste(
+                        columnas, cliente::setComision, comision,
+                        "comision"
+                );
+                asignarSiExiste(
+                        columnas, cliente::setDiasOperativos, diasOperativos,
+                        "diasoperativos"
+                );
+                asignarSiExiste(
+                        columnas, cliente::setTiempoInterrupcion,
+                        tiempoInterrupcion,
+                        "tiempointerrupcion",
+                        "tiempodeinterrupcion",
+                        "tiempodeinterrupciondias",
+                        "tiempointerrupcionestimado",
+                        "tiempoestimadodeinterrupciondias",
+                        "diasdeinterrupcion",
+                        "diasestimadosdeinterrupcion"
                 );
 
-                cliente.setMontoMaximoHabitual(
-                        montoMaximo
-                );
+                if (tieneColumna(columnas, "vip")) {
+                    cliente.setVip(vip);
+                }
 
-                cliente.setVip(vip);
-
-                cliente.setActivo(activo);
+                if (tieneColumna(columnas, "activo", "estado")) {
+                    cliente.setActivo(activo);
+                }
 
                 // ==========================================
                 // ASIGNAR CONFIGURACIÓN DE EMPRESA
@@ -344,6 +422,87 @@ public class ExcelClienteVipService {
                 .trim();
     }
 
+        private Map<String, Integer> construirMapaColumnas(
+                        Row encabezados,
+                        DataFormatter formatter) {
+
+                Map<String, Integer> columnas = new HashMap<>();
+
+                if (encabezados == null) {
+                        return columnas;
+                }
+
+                for (Cell celda : encabezados) {
+                        String encabezado = normalizar(celda, formatter);
+
+                        if (!encabezado.isEmpty()) {
+                                columnas.put(encabezado, celda.getColumnIndex());
+                        }
+                }
+
+                return columnas;
+        }
+
+        private String obtenerTexto(
+                        Row fila,
+                        Map<String, Integer> columnas,
+                        DataFormatter formatter,
+                        int indiceAnterior,
+                        String... nombres) {
+
+                for (String nombre : nombres) {
+                        Integer indice = columnas.get(normalizar(nombre));
+
+                        if (indice != null) {
+                                return obtenerTexto(fila.getCell(indice), formatter);
+                        }
+                }
+
+                if (indiceAnterior >= 0) {
+                        return obtenerTexto(fila.getCell(indiceAnterior), formatter);
+                }
+
+                return "";
+        }
+
+        private boolean tieneColumna(
+                        Map<String, Integer> columnas,
+                        String... nombres) {
+
+                for (String nombre : nombres) {
+                        if (columnas.containsKey(normalizar(nombre))) {
+                                return true;
+                        }
+                }
+
+                return false;
+        }
+
+        private <T> void asignarSiExiste(
+                        Map<String, Integer> columnas,
+                        java.util.function.Consumer<T> asignador,
+                        T valor,
+                        String... nombres) {
+
+                if (tieneColumna(columnas, nombres)) {
+                        asignador.accept(valor);
+                }
+        }
+
+        private String normalizar(
+                        Cell celda,
+                        DataFormatter formatter) {
+                return normalizar(obtenerTexto(celda, formatter));
+        }
+
+        private String normalizar(String valor) {
+                return java.text.Normalizer
+                                .normalize(valor == null ? "" : valor, java.text.Normalizer.Form.NFD)
+                                .replaceAll("\\p{M}", "")
+                                .replaceAll("[^a-zA-Z0-9]", "")
+                                .toLowerCase(Locale.ROOT);
+        }
+
     // ==========================================
     // MÉTODO PARA CONVERTIR MONTOS
     // ==========================================
@@ -352,7 +511,7 @@ public class ExcelClienteVipService {
             String texto) {
 
         if (texto == null || texto.isEmpty()) {
-            return BigDecimal.ZERO;
+                        return null;
         }
 
         try {
@@ -371,7 +530,49 @@ public class ExcelClienteVipService {
                     "Monto inválido: " + texto
             );
 
-            return BigDecimal.ZERO;
+                        return null;
         }
     }
+
+        private BigDecimal convertirComision(String texto) {
+
+                if (texto == null || texto.isEmpty()) {
+                        return null;
+                }
+
+                boolean esPorcentaje = texto.endsWith("%");
+                String valor = texto.replace("%", "").replace(",", "").trim();
+
+                try {
+                        BigDecimal comision = new BigDecimal(valor);
+                        return esPorcentaje
+                                        ? comision.movePointLeft(2)
+                                        : comision;
+                } catch (NumberFormatException e) {
+                        System.out.println("Comisión inválida: " + texto);
+                        return null;
+                }
+        }
+
+        private Integer convertirEntero(String texto) {
+
+                if (texto == null || texto.isEmpty()) {
+                        return null;
+                }
+
+                try {
+                        java.util.regex.Matcher coincidencia = java.util.regex.Pattern
+                                        .compile("-?\\d+")
+                                        .matcher(texto.replace(",", ""));
+
+                        if (!coincidencia.find()) {
+                                throw new NumberFormatException();
+                        }
+
+                        return Integer.valueOf(coincidencia.group());
+                } catch (NumberFormatException e) {
+                        System.out.println("Número entero inválido: " + texto);
+                        return null;
+                }
+        }
 }

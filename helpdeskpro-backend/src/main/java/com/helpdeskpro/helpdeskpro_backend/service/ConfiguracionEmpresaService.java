@@ -9,12 +9,24 @@ import org.springframework.stereotype.Service;
 public class ConfiguracionEmpresaService {
 
     private final ConfiguracionEmpresaRepository repository;
+    private final MonedaService monedaService;
 
-    public ConfiguracionEmpresaService(ConfiguracionEmpresaRepository repository) {
+    public ConfiguracionEmpresaService(
+            ConfiguracionEmpresaRepository repository,
+            MonedaService monedaService) {
         this.repository = repository;
+        this.monedaService = monedaService;
     }
 
     public ConfiguracionEmpresa guardar(ConfiguracionEmpresa configuracion) {
+        if (configuracion.getMoneda() == null || configuracion.getMoneda().getId() == null) {
+            throw new IllegalArgumentException("Debe seleccionar una moneda válida.");
+        }
+
+        configuracion.setMoneda(
+                monedaService.buscarPorId(configuracion.getMoneda().getId())
+        );
+
         return repository.save(configuracion);
     }
 }
